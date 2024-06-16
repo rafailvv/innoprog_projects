@@ -9,7 +9,8 @@ class User(models.Model):
     last_name = models.CharField(max_length=100)
     phone = models.CharField(max_length=100)
     github = models.CharField(max_length=100)
-    telegram = models.CharField(max_length=100)
+    telegram_username = models.CharField(max_length=100)
+    telegram_id = models.BigIntegerField(null=True)
 
 
 # Create your models here.
