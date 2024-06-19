@@ -7,7 +7,9 @@ from rest_framework.decorators import api_view
 from django.forms.models import model_to_dict
 from rest_framework.response import Response
 
-from .models import User
+from .models import User, Project
+from .serializers import ProjectsSerializer
+
 
 def encode_password(password):
     encoded_bytes = base64.b64encode(password.encode('utf-8'))
@@ -88,3 +90,44 @@ def edit_view(request):
             return JsonResponse(model_to_dict(user), status=status.HTTP_200_OK)
         else:
             return JsonResponse({'error': 'Пользователь не авторизован'}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(["GET"])
+def projects_view(request):
+    if request.method == "GET":
+        project = Project.objects.all()
+        serializer = ProjectsSerializer(project, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+
+
+@api_view(['POST'])
+def add_project_view(request):
+    if request.method == 'POST':
+        serializer = ProjectsSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def login_tg_view(request):
+    if request.method == "POST":
+        data = request.data
+        if User.objects.filter(telegram_id=data['telegram_id']).exists():
+            user = User.objects.get(telegram_id=data['telegram_id'])
+            request.session["user_id"] = user.id
+            return JsonResponse(model_to_dict(user), status=status.HTTP_200_OK)
+        else:
+            return JsonResponse({'error': 'Такого пользователя не существует'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+def project_view(request,id):
+    if request.method == "GET":
+        try:
+            project = Project.objects.get(pk=id)
+            serializer = ProjectsSerializer(project)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Project.DoesNotExist:
+            return JsonResponse({'error': 'Проект не найден'}, status=status.HTTP_400_BAD_REQUEST)
