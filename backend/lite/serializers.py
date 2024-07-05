@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Project, User, Checkpoint, Submission
+from .models import Project, User, Checkpoint, Submission, Feedback
 
 
 class ProjectsSerializer(serializers.ModelSerializer):
@@ -42,3 +42,13 @@ class SubmissionRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = Submission
         fields = ['github', 'file']
+
+class FeedbackSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Feedback
+        fields = '__all__'
+
+class FeedbackRequestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Feedback
+        fields = ['grade', 'comment']

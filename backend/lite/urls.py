@@ -15,5 +15,6 @@ urlpatterns = [
     path("project/<int:id>/", project_view, name='project'),
     path("checkpoint/<int:id>/", checkpoint_view, name='checkpoint'),
     path("submission/<int:id>", submission_view, name='submission'),
+    path("feedback/<int:id>", feedback_view, name='feedback')
 ]
 

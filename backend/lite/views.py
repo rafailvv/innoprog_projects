@@ -9,10 +9,10 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from django.forms.models import model_to_dict
 from rest_framework.response import Response
-
-from .models import User, Project, Checkpoint, Submission
+from .models import User, Project, Checkpoint, Submission, Feedback
 from .serializers import ProjectsSerializer, UserSerializer, LoginSerializer, UserTgSerializer, CheckpointSerializer, \
-    CheckpointRequestSerializer, SubmissionSerializer, SubmissionRequestSerializer
+    CheckpointRequestSerializer, SubmissionSerializer, SubmissionRequestSerializer, FeedbackSerializer, \
+    FeedbackRequestSerializer
 
 
 def encode_password(password):
@@ -369,3 +369,93 @@ def submission_view(request, id):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Submission.DoesNotExist:
             return JsonResponse({'error': 'Запись не найдена'}, status=status.HTTP_400_BAD_REQUEST)
+
+@swagger_auto_schema(
+    operation_summary="Добавление комментария",
+    request_body=FeedbackRequestSerializer,
+    method='POST',
+    manual_parameters=[
+        openapi.Parameter("id", openapi.IN_PATH, description="id решения", type=openapi.TYPE_INTEGER)],
+    responses={
+        status.HTTP_201_CREATED: FeedbackSerializer,
+        status.HTTP_400_BAD_REQUEST: 'Bad request'
+    }
+)
+@swagger_auto_schema(
+    operation_summary="Просмотр всех комментариев к решению",
+    method='GET',
+    manual_parameters=[
+        openapi.Parameter("id", openapi.IN_PATH, description="id решения", type=openapi.TYPE_INTEGER)],
+    responses={
+        status.HTTP_200_OK: FeedbackSerializer,
+        status.HTTP_400_BAD_REQUEST: 'Bad request'
+    }
+)
+@swagger_auto_schema(
+    operation_summary="Удаление комметария",
+    method='DELETE',
+    manual_parameters=[
+        openapi.Parameter("id", openapi.IN_PATH, description="id комментария", type=openapi.TYPE_INTEGER)],
+    responses={
+        status.HTTP_204_NO_CONTENT: "no content",
+        status.HTTP_400_BAD_REQUEST: 'Bad request'}
+)
+@swagger_auto_schema(
+    operation_summary="Редактирование комментария",
+    request_body=FeedbackRequestSerializer,
+    method='PUT',
+    manual_parameters=[
+        openapi.Parameter("id", openapi.IN_PATH, description="id комментария", type=openapi.TYPE_INTEGER)],
+    responses={
+        status.HTTP_200_OK: FeedbackSerializer,
+        status.HTTP_400_BAD_REQUEST: 'Bad request'}
+)
+
+@api_view(['GET', 'POST', 'DELETE','PUT'])
+def feedback_view(request, id):
+    try:
+        user = User.objects.get(id=request.session["user_id"])
+    except User.DoesNotExist:
+        return JsonResponse({'error': 'Пользователь не авторизован'}, status=status.HTTP_400_BAD_REQUEST)
+    if request.method == 'POST':
+        try:
+            submission = Submission.objects.get(pk=id)
+            request.data['submission'] = submission.id
+            request.data["user"] = user.id
+            request.data["date_time"] = datetime.datetime.now()
+            serializer = FeedbackSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Project.DoesNotExist:
+            return JsonResponse({'error': 'Проект не найден'}, status=status.HTTP_400_BAD_REQUEST)
+
+    if request.method == 'GET':
+        try:
+            submission = Submission.objects.get(pk=id)
+            feedbacks = Feedback.objects.filter(submission=submission).order_by("-date_time").all()
+            serializer = FeedbackSerializer(feedbacks, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Submission.DoesNotExist:
+            return JsonResponse({'error': 'Запись не найдена'}, status=status.HTTP_400_BAD_REQUEST)
+
+    if request.method == 'PUT':
+        try:
+            feedback = Feedback.objects.get(pk=id)
+            request.data['user'] = user.id
+            serializer = FeedbackSerializer(feedback, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Feedback.DoesNotExist:
+            return JsonResponse({'error': 'Отзыв не найден'}, status=status.HTTP_400_BAD_REQUEST)
+
+    if request.method == 'DELETE':
+        try:
+            feedback = Feedback.objects.get(pk=id)
+            feedback.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except Feedback.DoesNotExist:
+            return JsonResponse({'error': 'Отзыв не найден'}, status=status.HTTP_400_BAD_REQUEST)
