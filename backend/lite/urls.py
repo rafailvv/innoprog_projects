@@ -14,6 +14,6 @@ urlpatterns = [
     path("login/tg/", login_tg_view, name='login'),
     path("project/<int:id>/", project_view, name='project'),
     path("checkpoint/<int:id>/", checkpoint_view, name='checkpoint'),
-    #path("submission/<int:checkpoint_id>", submission_view, name='submission'),
+    path("submission/<int:id>", submission_view, name='submission'),
 ]
 

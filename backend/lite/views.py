@@ -1,3 +1,4 @@
+import datetime
 import json
 import base64
 from django.http import JsonResponse
@@ -9,9 +10,9 @@ from rest_framework.decorators import api_view
 from django.forms.models import model_to_dict
 from rest_framework.response import Response
 
-from .models import User, Project, Checkpoint
+from .models import User, Project, Checkpoint, Submission
 from .serializers import ProjectsSerializer, UserSerializer, LoginSerializer, UserTgSerializer, CheckpointSerializer, \
-    CheckpointRequestSerializer
+    CheckpointRequestSerializer, SubmissionSerializer, SubmissionRequestSerializer
 
 
 def encode_password(password):
@@ -202,7 +203,7 @@ def login_tg_view(request):
 @swagger_auto_schema(
     operation_summary="Просмотр проекта по id",
     method='GET',
-    manual_parameters=[openapi.Parameter('id', openapi.IN_QUERY, description="id проекта", type=openapi.TYPE_INTEGER)],
+    manual_parameters=[openapi.Parameter('id', openapi.IN_PATH, description="id проекта", type=openapi.TYPE_INTEGER)],
     responses={
         status.HTTP_200_OK: ProjectsSerializer,
         status.HTTP_400_BAD_REQUEST: 'Bad request'
@@ -223,7 +224,8 @@ def project_view(request, id):
     operation_summary="Создание чекпоинта к проекту",
     request_body=CheckpointRequestSerializer,
     method='POST',
-    manual_parameters=[openapi.Parameter('id', openapi.IN_QUERY, description="id проекта", type=openapi.TYPE_INTEGER)],
+    manual_parameters=[
+        openapi.Parameter("id", openapi.IN_PATH, description="id проекта", type=openapi.TYPE_INTEGER)],
     responses={
         status.HTTP_201_CREATED: CheckpointSerializer,
         status.HTTP_400_BAD_REQUEST: 'Bad request'
@@ -232,7 +234,8 @@ def project_view(request, id):
 @swagger_auto_schema(
     operation_summary="Просмотр чекпоинта к проекту",
     method='GET',
-    manual_parameters=[openapi.Parameter('id', openapi.IN_QUERY, description="id проекта", type=openapi.TYPE_INTEGER)],
+    manual_parameters=[
+        openapi.Parameter("id", openapi.IN_PATH, description="id проекта", type=openapi.TYPE_INTEGER)],
     responses={
         status.HTTP_200_OK: CheckpointSerializer,
         status.HTTP_400_BAD_REQUEST: 'Bad request'
@@ -241,7 +244,8 @@ def project_view(request, id):
 @swagger_auto_schema(
     operation_summary="Удаление чекпоинта по id",
     method='DELETE',
-    manual_parameters=[openapi.Parameter('id', openapi.IN_QUERY, description="id Checkpoint", type=openapi.TYPE_INTEGER)],
+    manual_parameters=[
+        openapi.Parameter("id", openapi.IN_PATH, description="id Checkpoint", type=openapi.TYPE_INTEGER)],
     responses={
         status.HTTP_204_NO_CONTENT: "no content",
         status.HTTP_400_BAD_REQUEST: 'Bad request'
@@ -252,7 +256,7 @@ def checkpoint_view(request, id):
     if request.method == "POST":
         try:
             project = Project.objects.get(pk=id)
-            request.data['project'] = project
+            request.data['project'] = project.id
             serializer = CheckpointSerializer(data=request.data)
             if serializer.is_valid():
                 serializer.save()
@@ -275,3 +279,93 @@ def checkpoint_view(request, id):
             return Response(status=status.HTTP_204_NO_CONTENT)
         except Checkpoint.DoesNotExist:
             return JsonResponse({'error': 'Чекпоинт не найден'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@swagger_auto_schema(
+    operation_summary="Создание решения для чекпоинта",
+    request_body=SubmissionRequestSerializer,
+    method='POST',
+    manual_parameters=[
+        openapi.Parameter("id", openapi.IN_PATH, description="id checkpoint", type=openapi.TYPE_INTEGER)],
+    responses={
+        status.HTTP_201_CREATED: SubmissionSerializer,
+        status.HTTP_400_BAD_REQUEST: 'Bad request'
+    }
+)
+@swagger_auto_schema(
+    operation_summary="Просмотр решения для чекпоинта",
+    method='GET',
+    manual_parameters=[
+        openapi.Parameter("id", openapi.IN_PATH, description="id checkpoint", type=openapi.TYPE_INTEGER)],
+    responses={
+        status.HTTP_200_OK: SubmissionSerializer,
+        status.HTTP_400_BAD_REQUEST: 'Bad request'
+    }
+)
+@swagger_auto_schema(
+    operation_summary="Удаление решения по id",
+    method='DELETE',
+    manual_parameters=[
+        openapi.Parameter("id", openapi.IN_PATH, description="id решения", type=openapi.TYPE_INTEGER)],
+    responses={
+        status.HTTP_204_NO_CONTENT: "no content",
+        status.HTTP_400_BAD_REQUEST: 'Bad request'}
+)
+@swagger_auto_schema(
+    operation_summary="Обновление решения по id",
+    request_body=SubmissionRequestSerializer,
+    method='PUT',
+    manual_parameters=[
+        openapi.Parameter("id", openapi.IN_PATH, description="id решения", type=openapi.TYPE_INTEGER)],
+    responses={
+        status.HTTP_200_OK: SubmissionSerializer,
+        status.HTTP_400_BAD_REQUEST: 'Bad request'}
+)
+@api_view(['GET', 'POST', 'DELETE','PUT'])
+def submission_view(request, id):
+    try:
+        user = User.objects.get(id=request.session["user_id"])
+    except User.DoesNotExist:
+        return JsonResponse({'error': 'Пользователь не авторизован'}, status=status.HTTP_400_BAD_REQUEST)
+    if request.method == 'POST':
+        try:
+            checkpoint = Checkpoint.objects.get(pk=id)
+            request.data['checkpoint'] = checkpoint.id
+            request.data["user"] = user.id
+            request.data["date_time"] = datetime.datetime.now()
+            serializer = SubmissionSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Checkpoint.DoesNotExist:
+            return JsonResponse({'error': 'Чекпоинт не найден'}, status=status.HTTP_400_BAD_REQUEST)
+
+    if request.method == 'GET':
+        try:
+            checkpoint = Checkpoint.objects.get(pk=id)
+            submissions = Submission.objects.filter(checkpoint=checkpoint).filter(user=user).all()
+            serializer = SubmissionSerializer(submissions, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Checkpoint.DoesNotExist:
+            return JsonResponse({'error': 'Чекпоинт не найден'}, status=status.HTTP_400_BAD_REQUEST)
+
+    if request.method == 'DELETE':
+        try:
+            submission = Submission.objects.get(pk=id)
+            submission.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except Submission.DoesNotExist:
+            return JsonResponse({'error': 'Запись не найдена'}, status=status.HTTP_400_BAD_REQUEST)
+
+    if request.method == 'PUT':
+        try:
+            submission = Submission.objects.get(pk=id)
+            request.data['user'] = user.id
+            serializer = SubmissionSerializer(submission, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Submission.DoesNotExist:
+            return JsonResponse({'error': 'Запись не найдена'}, status=status.HTTP_400_BAD_REQUEST)
