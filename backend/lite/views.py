@@ -79,9 +79,9 @@ def login_view(request):
                 request.session["user_id"] = user.id
                 return JsonResponse(model_to_dict(user), status=status.HTTP_200_OK)
             else:
-                return JsonResponse({'error': 'Неверный пароль'}, status=status.HTTP_400_BAD_REQUEST)
+                return JsonResponse({'error': 'Неверный логин или пароль'}, status=status.HTTP_400_BAD_REQUEST)
         else:
-            return JsonResponse({'error': 'Такого пользователя не существует'}, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse({'error': 'Неверный логин или пароль'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @swagger_auto_schema(
@@ -321,11 +321,11 @@ def checkpoint_view(request, id):
         status.HTTP_200_OK: SubmissionSerializer,
         status.HTTP_400_BAD_REQUEST: 'Bad request'}
 )
-@api_view(['GET', 'POST', 'DELETE','PUT'])
+@api_view(['GET', 'POST', 'DELETE', 'PUT'])
 def submission_view(request, id):
     try:
         user = User.objects.get(id=request.session["user_id"])
-    except User.DoesNotExist:
+    except:
         return JsonResponse({'error': 'Пользователь не авторизован'}, status=status.HTTP_400_BAD_REQUEST)
     if request.method == 'POST':
         try:
@@ -370,6 +370,7 @@ def submission_view(request, id):
         except Submission.DoesNotExist:
             return JsonResponse({'error': 'Запись не найдена'}, status=status.HTTP_400_BAD_REQUEST)
 
+
 @swagger_auto_schema(
     operation_summary="Добавление комментария",
     request_body=FeedbackRequestSerializer,
@@ -410,8 +411,7 @@ def submission_view(request, id):
         status.HTTP_200_OK: FeedbackSerializer,
         status.HTTP_400_BAD_REQUEST: 'Bad request'}
 )
-
-@api_view(['GET', 'POST', 'DELETE','PUT'])
+@api_view(['GET', 'POST', 'DELETE', 'PUT'])
 def feedback_view(request, id):
     try:
         user = User.objects.get(id=request.session["user_id"])
@@ -459,3 +459,28 @@ def feedback_view(request, id):
             return Response(status=status.HTTP_204_NO_CONTENT)
         except Feedback.DoesNotExist:
             return JsonResponse({'error': 'Отзыв не найден'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@swagger_auto_schema(
+    operation_summary="Поиск проекта пользователя",
+    method='GET',
+    responses={
+        status.HTTP_200_OK: ProjectsSerializer,
+        status.HTTP_400_BAD_REQUEST: 'Bad request'}
+)
+@api_view(['GET'])
+def projects_list_view(request):
+    try:
+        user = User.objects.get(id=request.session["user_id"])
+    except:
+        return JsonResponse({'error': 'Пользователь не авторизован'}, status=status.HTTP_400_BAD_REQUEST)
+    if request.method == "GET":
+        projects = []
+        submissions = Submission.objects.filter(user=user).all()
+        for submission in submissions:
+            checkpoint = submission.checkpoint
+            project = checkpoint.project
+            if project not in projects:
+                projects.append(project)
+        serializer = ProjectsSerializer(projects, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

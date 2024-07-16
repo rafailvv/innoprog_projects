@@ -52,3 +52,4 @@ class FeedbackRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = Feedback
         fields = ['grade', 'comment']
+

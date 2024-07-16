@@ -13,12 +13,19 @@ class User(models.Model):
     telegram_username = models.CharField(max_length=100)
     telegram_id = models.BigIntegerField(null=True)
 
+class Company(models.Model):
+    name = models.CharField(max_length=100)
+    password = models.CharField(max_length=100)
+    logo = models.CharField(max_length=500)
+    description = models.CharField(max_length=1000)
+    url = models.CharField(max_length=300)
+    field = models.CharField(max_length=1000)
 
 # Create your models here.
 class Project(models.Model):
     name = models.CharField(max_length=100)
     description = models.CharField(max_length=1000)
-    company = models.CharField(max_length=100)
+    company = models.ForeignKey(Company, on_delete=models.CASCADE)
     price = models.PositiveIntegerField()
     file = models.CharField(max_length=100)
     code_structure = models.CharField(max_length=1000)
@@ -50,5 +57,12 @@ class Feedback(models.Model):
     date_time = models.DateTimeField()
     like = models.IntegerField(default=0)
     dislike = models.IntegerField(default=0)
+
+
+
+
+
+
+
 
 
