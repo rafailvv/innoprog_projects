@@ -138,7 +138,7 @@ CORS_ALLOW_CREDENTIALS = True  # Если вам нужны кукисы или 
 CORS_ALLOW_HEADERS = ['*']  # Разрешить все заголовки
 CORS_ALLOW_METHODS = ['*']  # Разрешить все методы
 
-CORS_ALLOWED_ORIGINS = []  # Если есть конкретные разрешенные источники, укажите их здесь
+CORS_ALLOWED_ORIGINS = ["*"]  # Если есть конкретные разрешенные источники, укажите их здесь
 CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^https://.*$",  # Регулярное выражение для разрешения всех источников с https
 ]
