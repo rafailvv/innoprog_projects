@@ -133,15 +133,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CORS_ALLOW_ALL_ORIGINS = False  # Это значение по умолчанию и оно должно быть False
+CORS_ALLOW_ALL_ORIGINS = True  # Это значение по умолчанию и оно должно быть False
 CORS_ALLOW_CREDENTIALS = True  # Если вам нужны кукисы или авторизация
-CORS_ALLOW_HEADERS = ['*']  # Разрешить все заголовки
-CORS_ALLOW_METHODS = ['*']  # Разрешить все методы
-
-CORS_ALLOWED_ORIGINS = ["*"]  # Если есть конкретные разрешенные источники, укажите их здесь
-CORS_ALLOWED_ORIGIN_REGEXES = [
-    r"^https://.*$",  # Регулярное выражение для разрешения всех источников с https
-]
 
 CORS_ALLOW_HEADERS = [
     'content-type',
@@ -150,7 +143,12 @@ CORS_ALLOW_HEADERS = [
     'x-requested-with',
 ]
 
-CORS_EXPOSE_HEADERS = [
-    'Access-Control-Allow-Origin',
+CORS_ALLOW_METHODS = [
+    'GET',
+    'POST',
+    'PUT',
+    'PATCH',
+    'DELETE',
+    'OPTIONS',
 ]
 
