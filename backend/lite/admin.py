@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Project, Checkpoint, Submission, Feedback, User
+from .models import Project, Checkpoint, Submission, Feedback, User, Company
 from django.contrib import admin
 from django.contrib.auth.models import User as BaseUser
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
