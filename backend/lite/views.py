@@ -519,9 +519,10 @@ def company_view(request, id):
     if request.method == "GET":
         try:
             company = Company.objects.get(pk=id)
-            serializer = CompanySerializer(company,{"logo":config["DOMEN"]+"static/companies/" + company.logo},partial=True)
+            serializer = CompanySerializer(company)
+            serializer.data["logo"] = config["DOMEN"] + "static/companies/" + serializer.data["logo"]
             return Response(serializer.data, status=status.HTTP_200_OK)
-        except:
+        except Company.DoesNotExist:
             return JsonResponse({'error': 'Компания не найдена'}, status=status.HTTP_400_BAD_REQUEST)
 
 
