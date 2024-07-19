@@ -9,6 +9,8 @@ https://docs.djangoproject.com/en/5.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
+import os
+
 import dotenv
 from dotenv import dotenv_values
 
@@ -27,13 +29,14 @@ SECRET_KEY = 'django-insecure-avdq5xnoxo5m#$wh(g(_o928fupfyxt=u5t6^vkp(kw(#n7@_k
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["projects.innoprog.ru","127.0.0.1"]
+ALLOWED_HOSTS = ["projects.innoprog.ru", "127.0.0.1", "185.209.28.14"]
 
 # Application definition
 
 INSTALLED_APPS = [
     'lite',
     'drf_yasg',
+    'corsheaders',
     'rest_framework',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -47,6 +50,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -118,10 +122,35 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-STATIC_URL = 'static/'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CORS_ALLOW_ALL_ORIGINS = False  # Это значение по умолчанию и оно должно быть False
+CORS_ALLOW_CREDENTIALS = True  # Если вам нужны кукисы или авторизация
+CORS_ALLOW_HEADERS = ['*']  # Разрешить все заголовки
+CORS_ALLOW_METHODS = ['*']  # Разрешить все методы
+
+CORS_ALLOWED_ORIGINS = []  # Если есть конкретные разрешенные источники, укажите их здесь
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^https://.*$",  # Регулярное выражение для разрешения всех источников с https
+]
+
+CORS_ALLOW_HEADERS = [
+    'content-type',
+    'authorization',
+    'x-csrftoken',
+    'x-requested-with',
+]
+
+CORS_EXPOSE_HEADERS = [
+    'Access-Control-Allow-Origin',
+]
+
