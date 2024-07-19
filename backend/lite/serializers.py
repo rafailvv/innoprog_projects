@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Project, User, Checkpoint, Submission, Feedback
+from .models import Project, User, Checkpoint, Submission, Feedback, Company
 
 
 class ProjectsSerializer(serializers.ModelSerializer):
@@ -52,4 +52,11 @@ class FeedbackRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = Feedback
         fields = ['grade', 'comment']
+
+class CompanySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Company
+        fields = '__all__'
+
+
 

@@ -17,5 +17,7 @@ urlpatterns = [
     path("submission/<int:id>", submission_view, name='submission'),
     path("feedback/<int:id>", feedback_view, name='feedback'),
     path("project/user/", projects_list_view, name='projects_list'),
+    path("company/<int:id>", company_view, name='company'),
+    path("company/",all_company_view, name='all_company'),
 ]
 

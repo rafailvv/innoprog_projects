@@ -3,18 +3,19 @@ import json
 import base64
 from django.http import JsonResponse
 from django.shortcuts import render
+from dotenv import dotenv_values
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.decorators import api_view
 from django.forms.models import model_to_dict
 from rest_framework.response import Response
-from .models import User, Project, Checkpoint, Submission, Feedback
+from .models import User, Project, Checkpoint, Submission, Feedback, Company
 from .serializers import ProjectsSerializer, UserSerializer, LoginSerializer, UserTgSerializer, CheckpointSerializer, \
     CheckpointRequestSerializer, SubmissionSerializer, SubmissionRequestSerializer, FeedbackSerializer, \
-    FeedbackRequestSerializer
+    FeedbackRequestSerializer, CompanySerializer
 
-
+config = dotenv_values(".env")
 def encode_password(password):
     encoded_bytes = base64.b64encode(password.encode('utf-8'))
     encoded_password = encoded_bytes.decode('utf-8')
@@ -484,3 +485,47 @@ def projects_list_view(request):
                 projects.append(project)
         serializer = ProjectsSerializer(projects, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@swagger_auto_schema(
+    operation_summary="Просмотр профиля компаний",
+    method='GET',
+    responses={
+        status.HTTP_201_CREATED: CompanySerializer,
+        status.HTTP_400_BAD_REQUEST: 'Bad request'
+    }
+)
+@api_view(["GET"])
+def all_company_view(request):
+    if request.method == "GET":
+        companies = Company.objects.all()
+        serializer = CompanySerializer(companies, many=True)
+        for i in range (len(serializer.data)):
+            serializer.data[i]["logo"] = config["DOMEN"] + "static/companies/" + serializer.data[i]["logo"]
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@swagger_auto_schema(
+    operation_summary="Просмотр профиля компании по id",
+    method='GET',
+    manual_parameters=[
+        openapi.Parameter("id", openapi.IN_PATH, description="id компании", type=openapi.TYPE_INTEGER)],    responses={
+        status.HTTP_201_CREATED: CompanySerializer,
+        status.HTTP_400_BAD_REQUEST: 'Bad request'
+    }
+)
+@api_view(["GET"])
+def company_view(request, id):
+    if request.method == "GET":
+        try:
+            company = Company.objects.get(pk=id)
+            serializer = CompanySerializer(company,{"logo":config["DOMEN"]+"static/companies/" + company.logo},partial=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except:
+            return JsonResponse({'error': 'Компания не найдена'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+
+
