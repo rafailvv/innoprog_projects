@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import ProjectRow from '../components/ProjectRow';
+import { getProfile, getProjects, getUserProjects } from '../services/Api';
 
 
 const projectsBoilerplate = [
@@ -27,6 +28,18 @@ function AllProjects() {
     const [hotProjects] = useState(projectsBoilerplate);
     const [doneProjects] = useState(projectsBoilerplate);
     const [inProcessProjects] = useState(projectsBoilerplate);
+
+    useEffect(() => {
+            getProjects().then(response => response.json()).then(data => {
+            getUserProjects().then(response => response.json()).then(data => {
+                console.log(data)
+            })
+            getProfile().then(response => response.json()).then(data => {
+                console.log(data)
+            })
+            console.log(data)
+        });
+    }, [])
     return (
         <>
             <ProjectRow projects={hotProjects} name='Hot Projects'/>

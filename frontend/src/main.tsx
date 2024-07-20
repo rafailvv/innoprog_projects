@@ -6,9 +6,19 @@ import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import AllProjects from './routes/AllProjects.tsx';
 import Project from './routes/Project.tsx';
 import CheckPoint from './routes/CheckPoint.tsx';
+import Login from './routes/Login.tsx';
+import Register from './routes/Register.tsx';
 
 
 const router = createBrowserRouter([
+  {
+    path: "/login",
+    element: <Login />,
+  },
+  {
+    path: "/register",
+    element: <Register />,
+  },
   {
     path: "/",
     element: <App />,

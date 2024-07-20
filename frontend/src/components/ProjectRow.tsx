@@ -1,14 +1,14 @@
 import { Typography, Grid, Button } from "@mui/material";
-import ProjectCard from "../ProjectCard";
+import ProjectCard from "./ProjectCard";
 import { useNavigate } from "react-router-dom";
 
 function ProjectRow({ projects, name }) {
     const navigator = useNavigate();
-    function routeChange(id) {
+    function routeChange(id: number) {
         const inner_id = id
         return () => {
             console.log(inner_id)
-            navigator(inner_id);
+            navigator("/projects/"+inner_id);
         }
     }
 
