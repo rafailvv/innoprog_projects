@@ -1,8 +1,14 @@
 import { Typography, Grid, Button } from "@mui/material";
 import ProjectCard from "./ProjectCard";
 import { useNavigate } from "react-router-dom";
+import { ProjectItem } from "../services/types";
 
-function ProjectRow({ projects, name }) {
+interface Props {
+    projects: ProjectItem[],
+    name: string
+}
+
+function ProjectRow({ projects, name }: Props) {
     const navigator = useNavigate();
     function routeChange(id: number) {
         const inner_id = id

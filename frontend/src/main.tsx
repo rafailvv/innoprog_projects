@@ -8,6 +8,7 @@ import Project from './routes/Project.tsx';
 import CheckPoint from './routes/CheckPoint.tsx';
 import Login from './routes/Login.tsx';
 import Register from './routes/Register.tsx';
+import { CookiesProvider } from 'react-cookie';
 
 
 const router = createBrowserRouter([
@@ -40,6 +41,8 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <CookiesProvider>
+      <RouterProvider router={router} />
+    </CookiesProvider>
   </React.StrictMode>,
 )

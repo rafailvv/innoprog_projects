@@ -1,7 +1,7 @@
 import { Box, Button, TextField, Typography } from '@mui/material';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { postRegistration } from '../services/Api.ts';
+import { postRegistration } from '../services/api.ts';
 
 function Register() {
     const navigator = useNavigate();
