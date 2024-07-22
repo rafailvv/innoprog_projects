@@ -54,14 +54,18 @@ class Company(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        verbose_name = 'Компания'
+        verbose_name_plural = 'Компании'
+
 class Project(models.Model):
     name = models.CharField(max_length=100)
-    description = models.CharField(max_length=1000)
+    description = models.TextField(max_length=1000)
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
     price = models.PositiveIntegerField()
     file = models.FileField(upload_to='project_files/', blank=True, null=True)
-    code_structure = models.CharField(max_length=1000)
-    assessment_criteria = models.CharField(max_length=100),
+    code_structure = models.TextField(max_length=1000)
+    assessment_criteria = models.TextField(max_length=1000, default="Чистый код")
     difficulty = models.CharField(
         max_length=10,
         choices=ProjectDifficulty.choices,
@@ -71,15 +75,22 @@ class Project(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        verbose_name = 'Проект'
+        verbose_name_plural = 'Проекты'
 
 class Checkpoint(models.Model):
     name = models.CharField(max_length=30)
-    description = models.CharField(max_length=1000)
+    description = models.TextField(max_length=1000)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     points = models.PositiveIntegerField(validators=[MinValueValidator(1), MaxValueValidator(100)])
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        verbose_name = 'Контрольная точка'
+        verbose_name_plural = 'Контрольные точки'
 
 class Submission(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -91,20 +102,27 @@ class Submission(models.Model):
     accepted = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.user.username + " - " + self.checkpoint.name
+        return f"{self.user.username} - {self.checkpoint.name}"
 
+    class Meta:
+        verbose_name = 'Отправка'
+        verbose_name_plural = 'Отправки'
 
 class Feedback(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     submission = models.ForeignKey(Submission, on_delete=models.CASCADE)
     grade = models.PositiveIntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
-    comment = models.CharField(max_length=2000)
+    comment = models.TextField(max_length=2000)
     date_time = models.DateTimeField()
     like = models.IntegerField(default=0)
     dislike = models.IntegerField(default=0)
 
     def __str__(self):
-        return self.user.username + " - " + self.submission.checkpoint.name
+        return f"{self.user.username} - {self.submission.checkpoint.name}"
+
+    class Meta:
+        verbose_name = 'Обратная связь'
+        verbose_name_plural = 'Обратные связи'
 
 
 
