@@ -12,6 +12,31 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ['username', 'password', 'first_name', 'last_name', 'email', 'phone', 'github', 'telegram_username',
                   'telegram_id']
+        extra_kwargs = {
+            'first_name': {'required': True},
+            'last_name': {'required': True},
+            'email': {'required': False},
+            'phone': {'required': False},
+            'github': {'required': False},
+            'telegram_username': {'required': False},
+            'telegram_id': {'required': False},
+            'password': {'write_only': True}
+        }
+
+    def create(self, validated_data):
+        user = User(
+            username=validated_data.get('username'),
+            first_name=validated_data.get('first_name'),
+            last_name=validated_data.get('last_name'),
+            email=validated_data.get('email'),
+            phone=validated_data.get('phone'),
+            github=validated_data.get('github'),
+            telegram_username=validated_data.get('telegram_username'),
+            telegram_id=validated_data.get('telegram_id'),
+        )
+        user.set_password(validated_data['password'])
+        user.save()
+        return user
 
     def validate_password(self, value):
         validate_password(value)
