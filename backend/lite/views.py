@@ -80,12 +80,67 @@ def login_view(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+
+@swagger_auto_schema(
+    operation_summary="Обновление доступа пользователю",
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            'refresh': openapi.Schema(type=openapi.TYPE_STRING, description='JWT refresh token'),
+        },
+        required=['refresh']
+    ),
+    method='POST',
+    responses={
+        status.HTTP_200_OK: openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'access': openapi.Schema(type=openapi.TYPE_STRING, description='JWT access token')
+            }
+        ),
+        status.HTTP_400_BAD_REQUEST: openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'detail': openapi.Schema(type=openapi.TYPE_STRING, description='Сообщение об ошибке')
+            }
+        ),
+    },
+)
+@api_view(["POST"])
+def refresh_view(request):
+    try:
+        refresh_token = RefreshToken(request.data['refresh'])
+        access_token = refresh_token.access_token
+        return Response({'access': str(access_token)}, status=status.HTTP_200_OK)
+    except KeyError:
+        return Response({'detail': 'Refresh token обязателен'}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response({'detail': 'Неверный refresh token'}, status=status.HTTP_400_BAD_REQUEST)
+
+
 @swagger_auto_schema(
     operation_summary="Выход из аккаунта",
     method='POST',
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            'refresh': openapi.Schema(type=openapi.TYPE_STRING, description='JWT refresh token'),
+        },
+        required=['refresh']
+    ),
     responses={
-        status.HTTP_200_OK: 'Logged out',
-        status.HTTP_400_BAD_REQUEST: 'Bad request'
+        status.HTTP_200_OK: openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'detail': openapi.Schema(type=openapi.TYPE_STRING, description='Вышли из аккаунта')
+            }
+        ),
+        status.HTTP_400_BAD_REQUEST: openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'detail': openapi.Schema(type=openapi.TYPE_STRING, description='Сообщение об ошибке')
+            }
+        )
     }
 )
 @api_view(["POST"])
@@ -93,9 +148,11 @@ def logout_view(request):
     try:
         token = RefreshToken(request.data['refresh'])
         token.blacklist()
-        return Response(status=status.HTTP_200_OK)
+        return Response({'detail': 'Вышли из аккаунта'}, status=status.HTTP_200_OK)
+    except KeyError:
+        return Response({'detail': 'Refresh token обязателен'}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response({'detail': 'Неверный refresh token'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @swagger_auto_schema(
@@ -468,7 +525,7 @@ def submission_view(request, id):
 def close_submission_view(request, id):
     try:
         submission = Submission.objects.get(pk=id)
-        if submission.user!= request.user:
+        if submission.user != request.user:
             return JsonResponse({'error': 'Недостаточно прав'}, status=status.HTTP_403_FORBIDDEN)
         submission.is_visible = False
         submission.save()
@@ -494,7 +551,7 @@ def close_submission_view(request, id):
 def open_submission_view(request, id):
     try:
         submission = Submission.objects.get(pk=id)
-        if submission.user!= request.user:
+        if submission.user != request.user:
             return JsonResponse({'error': 'Недостаточно прав'}, status=status.HTTP_403_FORBIDDEN)
         submission.is_visible = True
         submission.save()
@@ -521,7 +578,7 @@ def open_submission_view(request, id):
 def accept_submission_view(request, id):
     try:
         submission = Submission.objects.get(pk=id)
-        if submission.user!= request.user:
+        if submission.user != request.user:
             return JsonResponse({'error': 'Недостаточно прав'}, status=status.HTTP_403_FORBIDDEN)
         feedbacks = Feedback.objects.filter(submission=submission)
         for feedback in feedbacks:

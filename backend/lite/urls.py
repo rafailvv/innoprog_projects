@@ -9,6 +9,7 @@ urlpatterns = [
     path('profile/', profile_view, name='profile'),
     path('edit/', edit_view, name='edit'),
     path('edit/password/', edit_password, name='edit_password'),
+    path('refresh/', refresh_view, name='refresh_view'),
 
     path("company/<int:id>/", company_view, name='company'),
     path("company/", all_company_view, name='all_company'),
