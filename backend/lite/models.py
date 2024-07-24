@@ -36,6 +36,9 @@ class User(AbstractUser):
     github = models.CharField(max_length=100, blank=True, null=True)
     telegram_username = models.CharField(max_length=100, blank=True, null=True)
     telegram_id = models.BigIntegerField(null=True, blank=True)
+    photo_fase = models.ImageField(upload_to='avatar_logo/', null=True, blank=True)
+    teacher = models.BooleanField(default=False)
+    position = models.CharField(max_length=100, default="")
 
     def __str__(self):
         return self.username
@@ -123,6 +126,9 @@ class Feedback(models.Model):
     class Meta:
         verbose_name = 'Обратная связь'
         verbose_name_plural = 'Обратные связи'
+
+
+
 
 
 

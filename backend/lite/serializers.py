@@ -59,7 +59,11 @@ class UserSerializer(serializers.ModelSerializer):
         if 'phone' in data and User.objects.filter(phone=data['phone']).exists():
             raise serializers.ValidationError({'phone': 'Пользователь с таким номером телефона уже существует.'})
         return data
-
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        if instance.photo_fase:
+            representation['photo_fase'] = settings.DOMAIN + settings.MEDIA_URL + str(instance.photo_fase)
+        return representation
 
 class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:

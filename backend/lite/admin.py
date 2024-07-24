@@ -41,5 +41,5 @@ class CompanyAdmin(admin.ModelAdmin):
 @admin.register(User)
 class UserAdmin(DefaultUserAdmin):
     fieldsets = DefaultUserAdmin.fieldsets + (
-        (None, {'fields': ('phone', 'github', 'telegram_username', 'telegram_id')}),
+        (None, {'fields': ('phone', 'github', 'telegram_username', 'telegram_id','teacher','position','photo_fase')}),
     )
