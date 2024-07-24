@@ -1,37 +1,28 @@
 import { Box, Button, TextField, Typography } from '@mui/material';
-import { useState } from 'react';
+import { FC, useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { postLogin } from '../services/api';
-import { Cookies, useCookies } from 'react-cookie';
+import { Context } from '../main';
+import { observer } from 'mobx-react-lite';
 
-export default function Login() {
+const Login: FC = () => {
     const navigator = useNavigate();
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [loginFailed, setLoginFailed] = useState(false);
 
-    const [cookies, setCookie] = useCookies(['access_token', 'refresh_token'])
+    const { store } = useContext(Context);
 
-
-    async function submitLogin() {
-        let status = 0;
-        await postLogin(username, password)
-            .then(response => {
-                console.log(response.headers.get('set-cookie'))
-                setCookie('access_token', response.headers.get('set-cookie'))
-                status = response.status;
-                return response.json()
-            })
-            .then(data => {
-                console.log(data);
-            });
-
-        if (Math.floor(status / 100) === 2) {
-            navigator("/projects");
-        } else {
+    const login = async () => {
+        await store.login(username, password);
+        console.log(store.isAuth);
+        if (!store.isAuth) {
             setLoginFailed(true);
+        } else {
+            navigator('/projects');
         }
     }
+    
+
     return (
         <Box
             component="form"
@@ -43,16 +34,33 @@ export default function Login() {
         >
             <div>
                 <TextField value={username} onChange={(e) => { setLoginFailed(false); setUsername(e.target.value); }} id="login"
-                    label="Login" variant="outlined" error={loginFailed} />
+                    label="Login" variant="outlined"
+                    error={loginFailed}
+                    helperText={store.badRequest?.username ? store.badRequest.username[0] : ''}
+                    onKeyUp={(e) => {
+                        if (e.key === 'Enter') {
+                            login()
+                        }
+                    }}
+                />
                 <br />
                 <TextField value={password} onChange={(e) => { setLoginFailed(false); setPassword(e.target.value); }} id="password"
                     label="Password" type="password" autoComplete="current-password" variant="outlined"
-                    error={loginFailed} />
+                    error={loginFailed}
+                    onKeyUp={(e) => {
+                        if (e.key === 'Enter') {
+                            login()
+                        }
+                    }}
+                    helperText={store.badRequest?.password ? store.badRequest.password[0] : ''}
+                />
                 <br />
                 <Typography variant="body2">Don't have an account? <Button variant="text" onClick={() => navigator("/register")}>Register</Button></Typography>
 
-                <Button variant="contained" onClick={submitLogin}>Submit</Button>
+                <Button variant="contained" onClick={login}>Submit</Button>
             </div>
         </Box>
     )
 }
+
+export default observer(Login);

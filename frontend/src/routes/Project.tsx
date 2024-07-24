@@ -2,11 +2,9 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { Accordion, AccordionDetails, AccordionSummary, Box, List, ListItemButton, ListItemIcon, ListItemText, Typography } from "@mui/material";
 import { useEffect, useState } from 'react';
 import DoneIcon from '@mui/icons-material/Done';
-import { CheckPointItem, ProjectItem } from '../services/types';
-import { getCheckPointsByProjectId, getProjectById } from '../services/api';
+import { CheckPointItem, ProjectItem } from '../models/types';
 import { useNavigate } from 'react-router-dom';
-
-// const pointBoilerplate = [{ text: 'check 1', status: 0 }, { text: 'check 2', status: 1 }, { text: 'check 3', status: 2 }]
+import ApiService from '../services/ApiService';
 
 function Project() {
     // const checkPoints = 4;
@@ -17,14 +15,8 @@ function Project() {
     useEffect(() => {
         const projectId = window.location.pathname.split("/").pop();
         if (!projectId) return;
-        getProjectById(parseInt(projectId)).then(response => response.json()).then(data => {
-            setProject(data);
-            // console.log(data);
-        })
-        getCheckPointsByProjectId(parseInt(projectId)).then(response => response.json()).then(data => {
-            setCheckPoints(data);
-            console.log(data);
-        })
+        ApiService.getProjectById(parseInt(projectId)).then(response => setProject(response.data))
+        ApiService.getCheckPointsByProjectId(parseInt(projectId)).then(response => setCheckPoints(response.data))
     }, [])
 
     function routeChange(id: number, index: number) {

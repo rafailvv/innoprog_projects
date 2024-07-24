@@ -1,48 +1,24 @@
-import React from 'react'
+import React, { createContext } from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
-import { RouterProvider, createBrowserRouter } from 'react-router-dom';
-import AllProjects from './routes/AllProjects.tsx';
-import Project from './routes/Project.tsx';
-import CheckPoint from './routes/CheckPoint.tsx';
-import Login from './routes/Login.tsx';
-import Register from './routes/Register.tsx';
-import { CookiesProvider } from 'react-cookie';
+import { BrowserRouter } from 'react-router-dom';
+import Store from './store/store.ts';
 
+interface State {
+  store: Store
+}
 
-const router = createBrowserRouter([
-  {
-    path: "/login",
-    element: <Login />,
-  },
-  {
-    path: "/register",
-    element: <Register />,
-  },
-  {
-    path: "/",
-    element: <App />,
-    // errorElement: <ErrorPage />,
-  },
-  {
-    path: "projects/",
-    element: <AllProjects />,
-  },
-  {
-    path: "projects/:projectId",
-    element: <Project />,
-  },
-  {
-    path: "projects/:projectId/:checkPointId",
-    element: <CheckPoint />,
-  },
-]);
+const store = new Store();
+export const Context = createContext<State>({ store });
+
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <CookiesProvider>
-      <RouterProvider router={router} />
-    </CookiesProvider>
+    <Context.Provider value={{ store }}>
+      <BrowserRouter>
+        <App/>
+      </BrowserRouter>
+    </Context.Provider>
   </React.StrictMode>,
 )

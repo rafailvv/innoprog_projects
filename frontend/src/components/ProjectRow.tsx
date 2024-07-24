@@ -1,7 +1,8 @@
 import { Typography, Grid, Button } from "@mui/material";
 import ProjectCard from "./ProjectCard";
 import { useNavigate } from "react-router-dom";
-import { ProjectItem } from "../services/types";
+import { ProjectItem } from "../models/types";
+import { observer } from "mobx-react-lite";
 
 interface Props {
     projects: ProjectItem[],
@@ -17,6 +18,7 @@ function ProjectRow({ projects, name }: Props) {
             navigator("/projects/"+inner_id);
         }
     }
+    console.log(projects)
 
     return (
         <>
@@ -34,4 +36,4 @@ function ProjectRow({ projects, name }: Props) {
     );
 }
 
-export default ProjectRow;
+export default observer(ProjectRow);

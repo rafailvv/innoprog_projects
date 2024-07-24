@@ -1,21 +1,14 @@
 import { Card, Box, Stack, Typography, Divider, Chip } from "@mui/material";
-import { getCompanyById } from "../services/api";
-import { useEffect, useState } from "react";
-import { Company, ProjectItem } from "../services/types";
+import { ProjectItem } from "../models/types";
 
 interface Props {
     project: ProjectItem
 }
 
 function ProjectCard({ project }: Props) {
-    const { id, name, description, price, file, code_structure, assessment_criteria, company: company_id } = project;
-    // if(company_id)
-    const [company, setCompany] = useState<Company>();
-    useEffect(() => {
-        getCompanyById(company_id).then(response => response.json()).then(data => {
-            setCompany(data);
-        })
-    }, []);
+    console.log(project)
+    const { id, name, description, price, file, code_structure, assessment_criteria, company } = project;
+    console.log(company)
     return (
         <Card variant="outlined" sx={{ maxWidth: 360 }}>
             <Box sx={{ p: 2 }}>

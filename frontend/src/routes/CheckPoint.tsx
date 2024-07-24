@@ -1,8 +1,8 @@
 import { Box, Button, List, ListItem, ListItemText, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import { getCheckPointsByProjectId, getFeedbackBySubmissionId, getProjectById, getSubmissionsByCheckPointId, postSubmissionByCheckPointId } from "../services/api";
-import { CheckPointItem, FeedbackItem, ProjectItem, SubmissionItem } from "../services/types";
+import { CheckPointItem, FeedbackItem, ProjectItem, SubmissionItem } from "../models/types";
 import { useLocation } from "react-router-dom";
+import ApiService from "../services/ApiService";
 
 
 
@@ -21,30 +21,19 @@ function CheckPoint() {
         console.log(checkpointId, projectId);
         if (!projectId) return;
         if (!checkpointId) return;
-        getProjectById(parseInt(projectId)).then(response => response.json()).then(data => {
-            setProject(data);
-        })
-        getCheckPointsByProjectId(parseInt(projectId)).then(response => response.json()).then(data => {
-            console.log(data);
-            setCheckPoint(data[innerCheckpointId]);
-        })
-        getSubmissionsByCheckPointId(parseInt(checkpointId)).then(response => {
-            if (Math.floor(response.status / 100) !== 2) {
-                throw new Error(response.statusText);
-            }
-            return response.json()
-        }).then(data => {
-            console.log(data);
-            setSubmissions(data);
+        ApiService.getProjectById(parseInt(projectId)).then(response => setProject(response.data)).catch(err => console.error(err));
+        ApiService.getCheckPointsByProjectId(parseInt(projectId))
+            .then(response => setCheckPoint(response.data[innerCheckpointId]))
+            .catch(err => console.error(err));
+        ApiService.getSubmissionsByCheckPointId(parseInt(checkpointId)).then(response => {
+            setSubmissions(response.data);
         }).catch(err => console.error(err));
     }, [])
     useEffect(() => {
         if (!submissions) return;
         console.log(submissions);
         for (const sub of submissions) {
-            getFeedbackBySubmissionId(sub.id).then(response => response.json()).then(data => {
-                setFeedbacks(data);
-            })
+            ApiService.getFeedbacksBySubmissionId(sub.id).then(response => setFeedbacks(response.data)).catch(err => console.error(err));
         }
 
     }, [submissions])
@@ -64,13 +53,14 @@ function CheckPoint() {
                 )}
             </List>
             <Typography variant="h5" gutterBottom>Ссылка на гит/файл</Typography>
-            <TextField id="standard-basic" label="Git" variant="standard" value={submissionText} onChange={(e) => setSubmissionText(e.target.value)}/>
+            <TextField id="standard-basic" label="Git" variant="standard" value={submissionText} onChange={(e) => setSubmissionText(e.target.value)} />
             <Box display="flex" flexDirection="column" gap="10px" margin="10px">
                 <Button variant="contained" onClick={() => {
-                    if(checkPoint === undefined) return;
-                    postSubmissionByCheckPointId(checkPoint?.id, "test", submissionText).then(response => response.json()).then(data => {
-                        console.log(data);
-                    })
+                    if (checkPoint === undefined) return;
+                    ApiService.postSubmissionByCheckPointId(checkPoint?.id, "test", submissionText)
+                    .then(response => {
+                        console.log(response.data);
+                    }).catch(err => console.error(err));
                     setSubmissionText('');
                 }}>Проверить</Button>
                 <Button variant="contained" disabled>

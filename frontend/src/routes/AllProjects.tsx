@@ -1,58 +1,30 @@
-import { useEffect, useState } from 'react';
+import { FC, useContext, useEffect, useState } from 'react';
 import ProjectRow from '../components/ProjectRow';
-import { getProfile, getProjects, getUserProjects } from '../services/api';
+import { Context } from '../main';
+import { observer } from 'mobx-react-lite';
+import ApiService from '../services/ApiService';
+import { ProjectItem } from '../models/types';
 
-// const projectsBoilerplate = [
-//     {
-//         name: "Разработка нейросети",
-//         description: 'Lorem ipsum dolor sit amet consectetur, adipisicing elit. Laudantium, officiis, ut nostrum incidunt nam rem porro nemo aspernatur, veniam deleniti optio ullam placeat? Ab quasi eveniet ex quae veritatis? Inventore?',
-//         studentsWork: 4,
-//         id:1
-//     },
-//     {
-//         name: "Поиск товаров",
-//         description: 'Lorem ipsum dolor sit, amet consectetur adipisicing elit. Ea laborum veritatis consectetur dolore! Omnis aliquid adipisci maiores nemo earum unde dolores, harum architecto hic voluptatibus, ad perspiciatis cumque, error aperiam.',
-//         studentsWork: 5,
-//         id:2
-//     },
-//     {
-//         name: "Разработка другой нейросети",
-//         description: 'Lorem ipsum dolor sit amet consectetur, adipisicing elit. Laudantium, officiis, ut nostrum incidunt nam rem porro nemo aspernatur, veniam deleniti optio ullam placeat? Ab quasi eveniet ex quae veritatis? Inventore?',
-//         studentsWork: 3,
-//         id:3
-//     },
-// ]
+const AllProjects: FC = () => {
+    const [hotProjects, setHotProjects] = useState<ProjectItem[]>([]);
+    const [doneProjects, setDoneProjects] = useState<ProjectItem[]>([]);
+    const [inProgressProjects, setInProgressProjects] = useState<ProjectItem[]>([]);
 
-function AllProjects() {
-    // const [hotProjects] = useState(projectsBoilerplate);
-    // const [doneProjects] = useState(projectsBoilerplate);
-    // const [inProcessProjects] = useState(projectsBoilerplate);
-    const [allProjects, setAllProjects] = useState([]);
-
-
-    // const [cookies, setCookie] = useCookies(['sessionid']);
-
-    // console.log("wtf"+document.cookie)
+    const { store } = useContext(Context);
 
     useEffect(() => {
-            getProjects().then(response => response.json()).then(data => {
-                console.log(data);
-                setAllProjects(data);
-            });
-            getUserProjects().then(response => response.json()).then(data => {
-                console.log(data)
-            })
-            getProfile(document.cookie).then(response => response.json()).then(data => {
-                console.log(data)
-            })
+        store.getProjects()
+        ApiService.getHotProjects().then(response => setHotProjects(response.data))
+        ApiService.getDoneProjects().then(response => setDoneProjects(response.data))
+        ApiService.getInProgressProjects().then(response => setInProgressProjects(response.data))
     }, [])
     return (
         <>
-            <ProjectRow projects={allProjects} name='Hot Projects'/>
-            {/* <ProjectRow projects={doneProjects} name='Done Projects'/>
-            <ProjectRow projects={inProcessProjects} name='In Process'/> */}
+            <ProjectRow projects={hotProjects} name='Hot Projects' />
+            <ProjectRow projects={doneProjects} name='Done Projects'/>
+            <ProjectRow projects={inProgressProjects} name='In Process'/>
         </>
     )
 }
 
-export default AllProjects;
+export default observer(AllProjects);
