@@ -7,7 +7,7 @@ interface Props {
 
 function ProjectCard({ project }: Props) {
     console.log(project)
-    const { id, name, description, price, file, code_structure, assessment_criteria, company } = project;
+    const { name, description, company } = project;
     console.log(company)
     return (
         <Card variant="outlined" sx={{ maxWidth: 360 }}>

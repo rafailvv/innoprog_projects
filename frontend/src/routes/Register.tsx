@@ -47,7 +47,7 @@ const Register: FC = () => {
                 <TextField value={password} onChange={(e) => { setPassword(e.target.value); }} id="password"
                     label="Password*" type="password" autoComplete="current-password" variant="outlined"
                     error={errors && 'password' in errors}
-                    helperText={errors && 'password' in errors ? errors.password[0] : ''}
+                    helperText={(errors && 'password' in errors) ? (errors as any).password[0] : ''}
                 />
                 <br />
                 <TextField value={email} onChange={(e) => { setEmail(e.target.value); }} id="email"
@@ -65,7 +65,7 @@ const Register: FC = () => {
                 <TextField value={phone} onChange={(e) => { setPhone(e.target.value); }} id="phone"
                     label="Phone*" type="tel" variant="outlined"
                     error={errors && 'phone' in errors}
-                    helperText={errors && 'phone' in errors ? errors.phone[0] : ''}
+                    helperText={errors && 'phone' in errors ? (errors as any).phone[0] : ''}
                 />
                 <br />
                 <TextField value={github} onChange={(e) => { setGithub(e.target.value); }} id="git"

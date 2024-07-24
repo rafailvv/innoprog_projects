@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from "axios";
 import $api, { API_URL } from "../http";
-import { AuthResponse, CheckPointItem, CompanyItem, FeedbackItem, ProjectItem, SubmissionItem, UserItem } from "../models/types";
+import { AuthResponse, CheckPointItem, CompanyItem, FeedbackItem, ProjectItem, SubmissionItem } from "../models/types";
 
 export default class ApiService {
     //auth
