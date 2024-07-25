@@ -1,9 +1,9 @@
-import React, { createContext } from 'react'
+import { createContext } from 'react'
 import ReactDOM from 'react-dom/client'
-import App from './App.tsx'
 import './index.css'
-import { BrowserRouter } from 'react-router-dom';
 import Store from './store/store.ts';
+import React from 'react';
+import App from './App.tsx';
 
 interface State {
   store: Store
@@ -16,9 +16,7 @@ export const Context = createContext<State>({ store });
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <Context.Provider value={{ store }}>
-      <BrowserRouter>
-        <App/>
-      </BrowserRouter>
+      <App/>
     </Context.Provider>
-  </React.StrictMode>,
+  </React.StrictMode >,
 )

@@ -1,16 +1,42 @@
-import { Route, Routes } from 'react-router-dom'
+import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
 import './App.css'
-import Register from './routes/Register'
-import Login from './routes/Login'
-import PrivateRoute from './components/PrivateRoute'
-import AllProjects from './routes/AllProjects'
-import Project from './routes/Project'
-import CheckPoint from './routes/CheckPoint'
-import ProtectedRoute from './components/ProtectedRoute'
+import Register from './pages/Register'
+import Login from './pages/Login'
 import { useContext, useEffect } from 'react'
 import { Context } from './main'
+import AllProjects from './pages/AllProjects'
+import Project from './pages/Project'
+import CheckPoint from './pages/CheckPoint'
+
 
 function App() {
+  const router = createBrowserRouter(
+    !localStorage.getItem('token') ? [
+    {
+      path: "/",
+      element: <Navigate to="/login" />
+    },
+    {
+      path: "/login",
+      element: <Login />
+    },
+    {
+      path: "/register",
+      element: <Register />
+    },] : [
+    {
+      path: "/projects",
+      element: <AllProjects />
+    },
+    {
+      path: "/projects/:projectId",
+      element: <Project />
+    },
+    {
+      path: "/projects/:projectId/:checkPointId",
+      element: <CheckPoint />
+    }
+  ])
   const { store } = useContext(Context)
   useEffect(() => {
     if(localStorage.getItem('token'))
@@ -18,7 +44,9 @@ function App() {
   }, [])
   return (
     <>
-      <Routes>
+      <RouterProvider router={router} />
+      {/* <Routes>
+        <Route path="/" element={<Login />} />
         <Route element={<ProtectedRoute />}>
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
@@ -28,7 +56,7 @@ function App() {
           <Route path="projects/:projectId" element={<Project />} />
           <Route path="projects/:projectId/:checkPointId" element={<CheckPoint />} />
         </Route>
-      </Routes>
+      </Routes> */}
     </>
   )
 }
