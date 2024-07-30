@@ -4,11 +4,15 @@ import { Context } from '../main';
 import { observer } from 'mobx-react-lite';
 import ApiService from '../services/ApiService';
 import { ProjectItem } from '../models/types';
+import { Button } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 const AllProjects: FC = () => {
     const [hotProjects, setHotProjects] = useState<ProjectItem[]>([]);
     const [doneProjects, setDoneProjects] = useState<ProjectItem[]>([]);
     const [inProgressProjects, setInProgressProjects] = useState<ProjectItem[]>([]);
+    const navigator = useNavigate();
+
 
     const { store } = useContext(Context);
 
@@ -20,9 +24,10 @@ const AllProjects: FC = () => {
     }, [])
     return (
         <>
+            <Button onClick={async () => { await store.logout(); navigator('/login'); }}> LogOut</Button>
             <ProjectRow projects={hotProjects} name='Hot Projects' />
-            <ProjectRow projects={doneProjects} name='Done Projects'/>
-            <ProjectRow projects={inProgressProjects} name='In Process'/>
+            <ProjectRow projects={doneProjects} name='Done Projects' />
+            <ProjectRow projects={inProgressProjects} name='In Process' />
         </>
     )
 }

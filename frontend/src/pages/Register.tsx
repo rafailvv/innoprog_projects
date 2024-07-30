@@ -42,6 +42,7 @@ const Register: FC = () => {
                     error={errors && 'username' in errors}
                     value={username} onChange={(e) => { setUsername(e.target.value); }} id="login"
                     label="Login*" variant="outlined"
+                    helperText={(errors && 'username' in errors) ? (errors as any).username[0] : ''}
                 />
                 <br />
                 <TextField value={password} onChange={(e) => { setPassword(e.target.value); }} id="password"

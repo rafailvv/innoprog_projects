@@ -7,11 +7,11 @@ import { Context } from './main'
 import AllProjects from './pages/AllProjects'
 import Project from './pages/Project'
 import CheckPoint from './pages/CheckPoint'
+import { observer } from 'mobx-react-lite'
 
 
 function App() {
-  const router = createBrowserRouter(
-    !localStorage.getItem('token') ? [
+  const unauthRoutes = [
     {
       path: "/",
       element: <Navigate to="/login" />
@@ -23,7 +23,9 @@ function App() {
     {
       path: "/register",
       element: <Register />
-    },] : [
+    }
+  ]
+  const authRoutes = [
     {
       path: "/projects",
       element: <AllProjects />
@@ -36,10 +38,12 @@ function App() {
       path: "/projects/:projectId/:checkPointId",
       element: <CheckPoint />
     }
-  ])
+  ]
+  const router = createBrowserRouter(localStorage.getItem('token') ? authRoutes : unauthRoutes)
   const { store } = useContext(Context)
   useEffect(() => {
-    if(localStorage.getItem('token'))
+    // console.log("useEffect")
+    if (localStorage.getItem('token'))
       store.checkAuth();
   }, [])
   return (
@@ -61,4 +65,4 @@ function App() {
   )
 }
 
-export default App
+export default observer(App);

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const API_URL = 'https://projects.innoprog.ru/lite';
+export const API_URL = 'https://projects.innoprog.ru/api/lite';
 
 const $api = axios.create({
     withCredentials: true,
