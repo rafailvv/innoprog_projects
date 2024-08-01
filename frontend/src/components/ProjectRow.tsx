@@ -18,12 +18,12 @@ function ProjectRow({ projects, name }: Props) {
             navigator("/projects/"+inner_id);
         }
     }
-    console.log(projects)
+    // console.log(projects)
 
     return (
         <>
             <Typography variant='h4' gutterBottom>{name}</Typography>
-            <Grid container spacing={2} sx={{ margin: "2px" }}>
+            <Grid container spacing={2} sx={{ margin: "2px" }} wrap="nowrap" >
                 {projects.map((value) => {
                     return <Button onClick={routeChange(value.id)} variant='text' key={value.name}>
                         <Grid item>

@@ -54,6 +54,13 @@ export default class ApiService {
         return $api.post(`/submission/${id}/`, {"github": github, "file": file})
     }
 
+    static async postLikeByFeedbackId(id: number, value: number): Promise<AxiosResponse<FeedbackItem>> {
+        return $api.post(`/feedback/like/${id}/`, {"value": value})
+    }
+    static async postDislikeByFeedbackId(id: number, value: number): Promise<AxiosResponse<FeedbackItem>> {
+        return $api.post(`/feedback/dislike/${id}/`, {"value": value})
+    }
+
     static async getRefresh() {
         return axios.post(`${API_URL}/refresh/`, {"refresh": localStorage.getItem('refresh')})
     }

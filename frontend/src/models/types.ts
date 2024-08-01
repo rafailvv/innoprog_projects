@@ -7,6 +7,12 @@ export interface ProjectItem {
     code_structure: string
     assessment_criteria: string
     company: CompanyItem
+    difficulty: Difficulty
+}
+export enum Difficulty {
+    easy = "easy",
+    medium = "medium",
+    hard = "hard"
 }
 export interface CompanyItem {
     id: number
@@ -28,24 +34,24 @@ export interface CheckPointItem {
 
 export interface SubmissionItem {
     id: number
+    user: UserItem
+    checkpoint: CheckPointItem
     github: string
     file: string
     date_time: string
-    revisions: boolean
+    is_visible: boolean
     accepted: boolean
-    user: number
-    checkpoint: number
 }
 
 export interface FeedbackItem {
     id: number
+    user: UserItem
+    submission: SubmissionItem
     grade: number
     comment: string
     date_time: string
     like: number
     dislike: number
-    user: number
-    submission: number
 }
 
 export interface AuthResponse {

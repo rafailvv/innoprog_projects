@@ -27,6 +27,10 @@ function App() {
   ]
   const authRoutes = [
     {
+      path: "/",
+      element: <Navigate to="/projects" />
+    },
+    {
       path: "/projects",
       element: <AllProjects />
     },

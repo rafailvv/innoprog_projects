@@ -1,8 +1,8 @@
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import { Accordion, AccordionDetails, AccordionSummary, Box, List, ListItemButton, ListItemIcon, ListItemText, Typography } from "@mui/material";
+import { Accordion, AccordionDetails, AccordionSummary, Box, Button, List, ListItemButton, ListItemIcon, ListItemText, Typography } from "@mui/material";
 import { useEffect, useState } from 'react';
 import DoneIcon from '@mui/icons-material/Done';
-import { CheckPointItem, ProjectItem } from '../models/types';
+import { CheckPointItem, ProjectItem, SubmissionItem } from '../models/types';
 import { useNavigate } from 'react-router-dom';
 import ApiService from '../services/ApiService';
 
@@ -10,14 +10,26 @@ function Project() {
     // const checkPoints = 4;
     const [checkPoints, setCheckPoints] = useState<CheckPointItem[]>()
     const [project, setProject] = useState<ProjectItem>();
+    const [submissions, setSubmissions] = useState<SubmissionItem[]>([]);
     const navigator = useNavigate();
 
     useEffect(() => {
         const projectId = window.location.pathname.split("/").pop();
         if (!projectId) return;
         ApiService.getProjectById(parseInt(projectId)).then(response => setProject(response.data))
-        ApiService.getCheckPointsByProjectId(parseInt(projectId)).then(response => setCheckPoints(response.data))
+        ApiService.getCheckPointsByProjectId(parseInt(projectId)).then(response => {
+            setCheckPoints(response.data);
+            for (let point of response.data) {
+                ApiService.getSubmissionsByCheckPointId(point.id).then(response => {
+                    console.log(response.data)
+                    setSubmissions([...submissions, ...response.data])
+                })
+            }
+        })
     }, [])
+    // console.log(project)
+    // console.log(checkPoints)
+    console.log(submissions)
 
     function routeChange(id: number, index: number) {
         return () => {
@@ -31,6 +43,7 @@ function Project() {
 
     return (
         <Box>
+            <Button onClick={() => { navigator('/projects'); }}> Все Проекты</Button>
             <Typography variant='h4' gutterBottom>{project?.name}</Typography>
             <Accordion defaultExpanded>
                 <AccordionSummary
@@ -105,8 +118,7 @@ function Project() {
                 </AccordionSummary>
                 <AccordionDetails>
                     <Typography>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-                        malesuada lacus ex, sit amet blandit leo lobortis eget.
+                        {project?.company.name}
                     </Typography>
                 </AccordionDetails>
             </Accordion>
@@ -119,10 +131,15 @@ function Project() {
                     <Typography variant='h5'>Ждут проверки</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                    <Typography>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-                        malesuada lacus ex, sit amet blandit leo lobortis eget.
-                    </Typography>
+                    {
+                        submissions?.map((value) => {
+                            return (
+                                <Typography key={value.id}>
+                                    Студент: {value.user.first_name}
+                                    , Чекпоинт: {value.checkpoint.name}
+                                </Typography>)
+                        })
+                    }
                 </AccordionDetails>
             </Accordion>
         </Box>
