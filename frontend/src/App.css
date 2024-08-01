@@ -1,0 +1,21 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.read-the-docs {
+  color: #888;
+}
+
+/* h1 header with bold text */
+h1 {
+  font-weight: bold;
+}
+
+/* h2 header with bold text */
+h2 {
+  font-weight: bold;
+}
+
