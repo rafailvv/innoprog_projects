@@ -1,6 +1,7 @@
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.db.models import Avg
 
 
 class ProjectDifficulty(models.TextChoices):
@@ -52,6 +53,13 @@ class User(AbstractUser):
         if total_feedbacks == 0:
             return None
         return (positive_feedbacks / total_feedbacks) * 100
+
+    @property
+    def average_feedback_score(self):
+        feedbacks = Feedback.objects.filter(submission__user=self)
+        if feedbacks.exists():
+            return round(feedbacks.aggregate(average_score=Avg('grade'))['average_score'],2)
+        return None
 
     def __str__(self):
         return self.username
