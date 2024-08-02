@@ -1,11 +1,14 @@
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.db.models import Avg
+
 
 class ProjectDifficulty(models.TextChoices):
     EASY = 'easy', 'Easy'
     MEDIUM = 'medium', 'Medium'
     HARD = 'hard', 'Hard'
+
 
 class CompanyField(models.TextChoices):
     IT = 'it', 'Информационные технологии'
@@ -31,6 +34,7 @@ class CompanyField(models.TextChoices):
     SPORTS = 'sports', 'Спорт'
     ART = 'art', 'Искусство'
 
+
 class User(AbstractUser):
     phone = models.CharField(max_length=100, blank=True, null=True)
     github = models.CharField(max_length=100, blank=True, null=True)
@@ -40,8 +44,26 @@ class User(AbstractUser):
     teacher = models.BooleanField(default=False)
     position = models.CharField(max_length=100, default="")
 
+    @property
+    def positive_feedback_rate(self):
+        feedbacks = Feedback.objects.filter(user=self)
+        valid_feedbacks = feedbacks.exclude(like=0, dislike=0)
+        positive_feedbacks = valid_feedbacks.filter(like=1).count()
+        total_feedbacks = valid_feedbacks.count()
+        if total_feedbacks == 0:
+            return None
+        return (positive_feedbacks / total_feedbacks) * 100
+
+    @property
+    def average_feedback_score(self):
+        feedbacks = Feedback.objects.filter(submission__user=self)
+        if feedbacks.exists():
+            return round(feedbacks.aggregate(average_score=Avg('grade'))['average_score'],2)
+        return None
+
     def __str__(self):
         return self.username
+
 
 class Company(models.Model):
     name = models.CharField(max_length=100)
@@ -60,6 +82,7 @@ class Company(models.Model):
     class Meta:
         verbose_name = 'Компания'
         verbose_name_plural = 'Компании'
+
 
 class Project(models.Model):
     name = models.CharField(max_length=100)
@@ -82,6 +105,7 @@ class Project(models.Model):
         verbose_name = 'Проект'
         verbose_name_plural = 'Проекты'
 
+
 class Checkpoint(models.Model):
     name = models.CharField(max_length=30)
     description = models.TextField(max_length=1000)
@@ -94,6 +118,7 @@ class Checkpoint(models.Model):
     class Meta:
         verbose_name = 'Контрольная точка'
         verbose_name_plural = 'Контрольные точки'
+
 
 class Submission(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -111,6 +136,7 @@ class Submission(models.Model):
         verbose_name = 'Отправка'
         verbose_name_plural = 'Отправки'
 
+
 class Feedback(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     submission = models.ForeignKey(Submission, on_delete=models.CASCADE)
@@ -126,15 +152,3 @@ class Feedback(models.Model):
     class Meta:
         verbose_name = 'Обратная связь'
         verbose_name_plural = 'Обратные связи'
-
-
-
-
-
-
-
-
-
-
-
-
