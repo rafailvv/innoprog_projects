@@ -63,8 +63,8 @@ class UserSerializer(serializers.ModelSerializer):
         representation = super().to_representation(instance)
         if instance.photo_fase:
             representation['photo_fase'] = settings.DOMAIN + settings.MEDIA_URL + str(instance.photo_fase)
+        representation['rate'] = instance.positive_feedback_rate
         return representation
-
 class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
