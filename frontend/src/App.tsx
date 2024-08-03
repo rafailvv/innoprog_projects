@@ -35,6 +35,10 @@ function App() {
             element: <Navigate to="/projects"/>
         },
         {
+            path: "/login",
+            element: <Login/>
+        },
+        {
             path: "/projects",
             element: <AllProjects/>
         },
@@ -57,18 +61,6 @@ function App() {
     return (
         <>
             <RouterProvider router={router}/>
-            {/* <Routes>
-        <Route path="/" element={<Login />} />
-        <Route element={<ProtectedRoute />}>
-          <Route path="login" element={<Login />} />
-          <Route path="register" element={<Register />} />
-        </Route>
-        <Route element={<PrivateRoute />}>
-          <Route path="projects" element={<AllProjects />} />
-          <Route path="projects/:projectId" element={<Project />} />
-          <Route path="projects/:projectId/:checkPointId" element={<CheckPoint />} />
-        </Route>
-      </Routes> */}
         </>
     )
 }

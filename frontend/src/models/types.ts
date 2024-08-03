@@ -7,7 +7,8 @@ export interface ProjectItem {
     code_structure: string
     assessment_criteria: string
     company: CompanyItem
-    difficulty: Difficulty
+    difficulty: Difficulty,
+    users_in_progress_count : number,
 }
 export enum Difficulty {
     easy = "easy",

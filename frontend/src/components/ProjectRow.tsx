@@ -1,4 +1,4 @@
-import { Typography, Grid, Button } from "@mui/material";
+import { Typography, Grid, Button, Box } from "@mui/material";
 import ProjectCard from "./ProjectCard";
 import { useNavigate } from "react-router-dom";
 import { ProjectItem } from "../models/types";
@@ -11,27 +11,41 @@ interface Props {
 
 function ProjectRow({ projects, name }: Props) {
     const navigator = useNavigate();
+
     function routeChange(id: number) {
-        const inner_id = id
         return () => {
-            console.log(inner_id)
-            navigator("/projects/"+inner_id);
+            navigator("/projects/" + id);
         }
     }
-    // console.log(projects)
 
     return (
         <>
             <Typography variant='h4' gutterBottom>{name}</Typography>
-            <Grid container spacing={2} sx={{ margin: "2px" }} wrap="nowrap" >
-                {projects.map((value) => {
-                    return <Button onClick={routeChange(value.id)} variant='text' key={value.name}>
-                        <Grid item>
-                            <ProjectCard project={value} ></ProjectCard>
+            <Box sx={{ overflowX: 'auto', paddingBottom: '15px' }}>
+                <Grid
+                    container
+                    spacing={2}
+                    sx={{
+                        display: 'inline-flex',
+                        flexWrap: 'nowrap'
+                    }}
+                >
+                    {projects.map((value) => (
+                        <Grid item key={value.id}>
+                            <Button
+                                onClick={routeChange(value.id)}
+                                variant='text'
+                                sx={{
+                                    minWidth: 'auto',
+                                    padding: 0
+                                }}
+                            >
+                                <ProjectCard project={value} />
+                            </Button>
                         </Grid>
-                    </Button>
-                })}
-            </Grid>
+                    ))}
+                </Grid>
+            </Box>
         </>
     );
 }
