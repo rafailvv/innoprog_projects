@@ -53,6 +53,7 @@ const AllProjects: FC = () => {
             <Button onClick={async () => {
                 await store.logout();
                 navigator('/login');
+                window.location.reload();
             }}>Выход</Button>
 
             {hotProjects.length > 0 && (

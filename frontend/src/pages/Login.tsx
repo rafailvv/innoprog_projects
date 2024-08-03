@@ -19,6 +19,7 @@ const Login: FC = () => {
             setLoginFailed(true);
         } else {
             navigator('/projects');
+            window.location.reload();
         }
     }
 

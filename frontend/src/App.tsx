@@ -24,19 +24,11 @@ function App() {
             path: "/register",
             element: <Register/>
         },
-        {
-            path: "/projects",
-            element: <AllProjects/>
-        },
     ]
     const authRoutes = [
         {
             path: "/",
             element: <Navigate to="/projects"/>
-        },
-        {
-            path: "/login",
-            element: <Login/>
         },
         {
             path: "/projects",
