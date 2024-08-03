@@ -1,92 +1,154 @@
-import { Box, Button, TextField, Typography } from '@mui/material';
+import { Box, Button, TextField, Typography, Link } from '@mui/material';
 import { FC, useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Context } from '../main';
+
+interface FormErrors {
+    username?: string[];
+    password?: string[];
+    email?: string[];
+    firstName?: string[];
+    lastName?: string[];
+    phone?: string[];
+    github?: string[];
+    telegramUsername?: string[];
+    telegramId?: string[];
+}
 
 const Register: FC = () => {
     const navigator = useNavigate();
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [email, setEmail] = useState("");
-    const [first_name, setFirst_name] = useState("");
-    const [last_name, setLast_name] = useState("");
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
     const [phone, setPhone] = useState("");
     const [github, setGithub] = useState("");
-    const [telegram_username, setTelegram_username] = useState("");
-    const [telegram_id, setTelegram_id] = useState(0);
+    const [telegramUsername, setTelegramUsername] = useState("");
+    const [telegramId, setTelegramId] = useState<number>(0);
 
-    const [errors, setErrors] = useState()
+    const [errors, setErrors] = useState<FormErrors>({});
     const { store } = useContext(Context);
 
-
-    async function submitRegister() {
-        await store.register(username, password, email, first_name, last_name, phone, github, telegram_username, telegram_id);
+    const submitRegister = async (e: React.FormEvent) => {
+        e.preventDefault();
+        await store.register(username, password, email, firstName, lastName, phone, github, telegramUsername, telegramId);
 
         if (store.badRequest) {
             setErrors(store.badRequest);
         } else {
             navigator("/login");
         }
-    }
+    };
+
     return (
         <Box
             component="form"
+            onSubmit={submitRegister}
             sx={{
-                '& .MuiTextField-root': { m: 1, width: '25ch' },
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: '100vh',
+                width: '100%',
+                maxWidth: '400px',
+                margin: 'auto',
+                textAlign: 'center'
             }}
             noValidate
             autoComplete="off"
         >
-            <div>
-                <TextField
-                    error={errors && 'username' in errors}
-                    value={username} onChange={(e) => { setUsername(e.target.value); }} id="login"
-                    label="Login*" variant="outlined"
-                    helperText={(errors && 'username' in errors) ? (errors as any).username[0] : ''}
-                />
-                <br />
-                <TextField value={password} onChange={(e) => { setPassword(e.target.value); }} id="password"
-                    label="Password*" type="password" autoComplete="current-password" variant="outlined"
-                    error={errors && 'password' in errors}
-                    helperText={(errors && 'password' in errors) ? (errors as any).password[0] : ''}
-                />
-                <br />
-                <TextField value={email} onChange={(e) => { setEmail(e.target.value); }} id="email"
-                    label="Email" type="email" autoComplete="current-email" variant="outlined"
-                    error={errors && 'email' in errors} />
-                <br />
-                <TextField value={first_name} onChange={(e) => { setFirst_name(e.target.value); }} id="name"
-                    label="Name" variant="outlined"
-                    error={errors && 'first_name' in errors} />
-                <br />
-                <TextField value={last_name} onChange={(e) => { setLast_name(e.target.value); }} id="surname"
-                    label="Surname" variant="outlined"
-                    error={errors && 'last_name' in errors} />
-                <br />
-                <TextField value={phone} onChange={(e) => { setPhone(e.target.value); }} id="phone"
-                    label="Phone*" type="tel" variant="outlined"
-                    error={errors && 'phone' in errors}
-                    helperText={errors && 'phone' in errors ? (errors as any).phone[0] : ''}
-                />
-                <br />
-                <TextField value={github} onChange={(e) => { setGithub(e.target.value); }} id="git"
-                    label="Github" type="text" variant="outlined"
-                    error={errors && 'github' in errors} />
-                <br />
-                <TextField value={telegram_username} onChange={(e) => { setTelegram_username(e.target.value); }} id="telegram"
-                    label="Telegram" type="text" variant="outlined"
-                    error={errors && 'telegram_username' in errors} />
-                <br />
-                <TextField value={telegram_id} onChange={(e) => { setTelegram_id(parseInt(e.target.value)); }} id="telegram_id"
-                    label="Telegram Id" type="number" variant="outlined"
-                    error={errors && 'telegram_id' in errors}
-                />
-                <br />
-                <Typography variant="body2">Already have an account? <Button variant="text" onClick={() => navigator("/login")}>Login</Button></Typography>
-                <Button variant="contained" onClick={submitRegister}>Register</Button>
-            </div>
+            <Typography variant="h3" sx={{ marginBottom: '20px', fontWeight: 'bold' }}>Регистрация</Typography>
+            <TextField
+                error={!!errors.username}
+                value={username} onChange={(e) => setUsername(e.target.value)} id="username"
+                label="Логин*" variant="outlined"
+                helperText={errors.username ? errors.username[0] : ''}
+                sx={{ marginBottom: '10px', width: '100%' }}
+            />
+            <TextField
+                error={!!errors.password}
+                value={password} onChange={(e) => setPassword(e.target.value)} id="password"
+                label="Пароль*" type="password" autoComplete="current-password" variant="outlined"
+                helperText={errors.password ? errors.password[0] : ''}
+                sx={{ marginBottom: '10px', width: '100%' }}
+            />
+            <TextField
+                value={email} onChange={(e) => setEmail(e.target.value)} id="email"
+                label="Email" type="email" autoComplete="current-email" variant="outlined"
+                error={!!errors.email}
+                sx={{ marginBottom: '10px', width: '100%' }}
+            />
+            <TextField
+                value={firstName} onChange={(e) => setFirstName(e.target.value)} id="firstName"
+                label="Имя" variant="outlined"
+                error={!!errors.firstName}
+                sx={{ marginBottom: '10px', width: '100%' }}
+            />
+            <TextField
+                value={lastName} onChange={(e) => setLastName(e.target.value)} id="lastName"
+                label="Фамилия" variant="outlined"
+                error={!!errors.lastName}
+                sx={{ marginBottom: '10px', width: '100%' }}
+            />
+            <TextField
+                value={phone} onChange={(e) => setPhone(e.target.value)} id="phone"
+                label="Телефон*" type="tel" variant="outlined"
+                error={!!errors.phone}
+                helperText={errors.phone ? errors.phone[0] : ''}
+                sx={{ marginBottom: '10px', width: '100%' }}
+            />
+            <TextField
+                value={github} onChange={(e) => setGithub(e.target.value)} id="github"
+                label="Ссылка на Github" type="text" variant="outlined"
+                error={!!errors.github}
+                sx={{ marginBottom: '10px', width: '100%' }}
+            />
+            <TextField
+                value={telegramUsername} onChange={(e) => setTelegramUsername(e.target.value)} id="telegramUsername"
+                label="Никнейм в Telegram" type="text" variant="outlined"
+                error={!!errors.telegramUsername}
+                sx={{ marginBottom: '10px', width: '100%' }}
+            />
+            <TextField
+                value={telegramId} onChange={(e) => setTelegramId(Number(e.target.value))} id="telegramId"
+                label="Telegram ID" type="number" variant="outlined"
+                error={!!errors.telegramId}
+                sx={{ marginBottom: '20px', width: '100%' }}
+            />
+            <Typography variant="body2" sx={{ marginBottom: '5px' }}>
+                Уже есть аккаунт?{' '}
+                <Link variant="body2" sx={{
+                    textDecoration: 'underline',
+                    cursor: 'pointer',
+                    '&:hover': {
+                        textDecoration: 'underline',
+                    },
+                }} onClick={() => navigator("/login")}>
+                    Войти
+                </Link>
+            </Typography>
+            <Button
+                type="submit"
+                variant="contained"
+                sx={{
+                    width: '100%',
+                    backgroundColor: '#9C78FF',
+                    fontWeight: 'bold',
+                    border: '2px solid #9C78FF',
+                    '&:hover': {
+                        backgroundColor: 'white',
+                        borderColor: '#9C78FF',
+                        color: '#9C78FF',
+                        border: '2px solid #9C78FF',
+                    },
+                }}
+            >
+                Зарегистрироваться
+            </Button>
         </Box>
-    )
+    );
 }
 
-export default Register
+export default Register;
