@@ -1,6 +1,14 @@
 import axios, { AxiosResponse } from "axios";
 import $api, { API_URL } from "../http";
-import { AuthResponse, CheckPointItem, CompanyItem, FeedbackItem, ProjectItem, SubmissionItem } from "../models/types";
+import {
+    AuthResponse,
+    CheckPointItem,
+    CompanyItem,
+    FeedbackItem,
+    ProjectItem,
+    SubmissionItem,
+    UserItem
+} from "../models/types";
 
 export default class ApiService {
     //auth
@@ -34,6 +42,9 @@ export default class ApiService {
     }
     static async getInProgressProjects(): Promise<AxiosResponse<ProjectItem[]>> {
         return $api.get('/project/in-progress/')
+    }
+    static async getProfile(): Promise<AxiosResponse<UserItem>> {
+        return $api.get(`/profile/`)
     }
     static async getProjectById(id: number): Promise<AxiosResponse<ProjectItem>> {
         return $api.get(`/project/${id}/`)

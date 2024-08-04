@@ -20,7 +20,7 @@ function ProjectRow({ projects, name }: Props) {
 
     return (
         <>
-            <Typography variant='h4' gutterBottom>{name}</Typography>
+            <Typography style={{marginBottom: '20px', fontWeight: 'bold'}} variant='h4' gutterBottom>{name}</Typography>
             <Box sx={{ overflowX: 'auto', paddingBottom: '15px' }}>
                 <Grid
                     container

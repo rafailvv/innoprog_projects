@@ -70,4 +70,5 @@ export interface UserItem {
     github: string
     telegram_username: string
     telegram_id: number
+    photo_fase : string
 }

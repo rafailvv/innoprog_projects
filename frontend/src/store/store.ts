@@ -1,12 +1,12 @@
-import { ProjectItem, UserItem } from "../models/types";
-import { makeAutoObservable } from "mobx";
+import {ProjectItem, UserItem} from "../models/types";
+import {makeAutoObservable} from "mobx";
 import ApiService from "../services/ApiService";
 
 export default class Store {
     user = {} as UserItem
     isAuth = false;
-    badRequest = {} as any
-    projects = [] as ProjectItem[]
+    badRequest = {} as any;
+    projects = [] as ProjectItem[];
 
     constructor() {
         makeAutoObservable(this);
@@ -15,21 +15,38 @@ export default class Store {
     setAuth(state: boolean) {
         this.isAuth = state
     }
+
     setUser(user: UserItem) {
         this.user = user
     }
+
+    setProfile(profile: UserItem) {
+        this.profile = profile
+    }
+
     setBadRequest(badRequest: any) {
         this.badRequest = badRequest
         console.log(badRequest)
     }
+
     setProjects(projects: ProjectItem[]) {
         this.projects = projects
     }
+
     async checkAuth() {
-        const response = await ApiService.getRefresh();
-        console.log(response)
-        localStorage.setItem('token', response.data.access);
-        this.setAuth(true);
+        try {
+            const response = await ApiService.getRefresh();
+            console.log(response)
+            localStorage.setItem('token', response.data.access);
+            this.setAuth(true);
+        }catch (err: any) {
+            console.error(err.response?.data);
+            this.setAuth(false);
+            if (err.response?.status === 400) {
+                this.setBadRequest(err.response.data);
+            }
+        }
+
     }
 
     async login(username: string, password: string) {
@@ -42,11 +59,12 @@ export default class Store {
             this.setAuth(true);
         } catch (err: any) {
             console.error(err.response?.data);
-            if(err.response?.status === 400) {
+            if (err.response?.status === 400) {
                 this.setBadRequest(err.response.data);
             }
         }
     }
+
     async register(username: string, password: string, email: string, first_name: string, last_name: string, phone: string, github: string, telegram_username: string, telegram_id: number) {
         try {
             this.setBadRequest(null);
@@ -54,11 +72,12 @@ export default class Store {
             this.setUser(response.data);
         } catch (err: any) {
             console.error(err.response?.data);
-            if(err.response?.status === 400) {
+            if (err.response?.status === 400) {
                 this.setBadRequest(err.response.data);
             }
         }
     }
+
     async logout() {
         try {
             await ApiService.logout();
@@ -69,6 +88,7 @@ export default class Store {
             console.error(err);
         }
     }
+
     async getProjects() {
         try {
             const response = await ApiService.getProjects();
@@ -78,5 +98,5 @@ export default class Store {
             console.error(err);
         }
     }
-    
+
 }

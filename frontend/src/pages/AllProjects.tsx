@@ -1,26 +1,28 @@
 import { FC, useContext, useEffect, useState } from 'react';
 import ProjectRow from '../components/ProjectRow';
+import ProjectGrid from '../components/ProjectGrid';
 import { Context } from '../main';
 import { observer } from 'mobx-react-lite';
 import ApiService from '../services/ApiService';
 import { ProjectItem } from '../models/types';
-import { Button } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
 import gearGif from '../assets/gear.gif';
+import Header from '../components/Header';
 
 const AllProjects: FC = () => {
     const [hotProjects, setHotProjects] = useState<ProjectItem[]>([]);
+    const [allProjects, setAllProjects] = useState<ProjectItem[]>([]);
     const [doneProjects, setDoneProjects] = useState<ProjectItem[]>([]);
     const [inProgressProjects, setInProgressProjects] = useState<ProjectItem[]>([]);
     const [loading, setLoading] = useState(true);
-    const navigator = useNavigate();
 
     const { store } = useContext(Context);
 
     useEffect(() => {
         const fetchData = async () => {
+            const allProjects = await ApiService.getProjects();
+            setAllProjects(allProjects.data);
+
             try {
-                await store.getProjects();
                 const [hot, done, inProgress] = await Promise.all([
                     ApiService.getHotProjects(),
                     ApiService.getDoneProjects(),
@@ -48,27 +50,36 @@ const AllProjects: FC = () => {
         );
     }
 
+    if (!store.isAuth) {
+        return (
+            <>
+                <Header />
+                {allProjects.length > 0 && (
+                    <div style={{ marginBottom: '20px' }}>
+                        <ProjectGrid projects={allProjects} name='Доступные проекты' />
+                    </div>
+                )}
+            </>
+        );
+    }
+
     return (
         <>
-            <Button onClick={async () => {
-                await store.logout();
-                navigator('/login');
-                window.location.reload();
-            }}>Выход</Button>
+            <Header />
 
             {hotProjects.length > 0 && (
-                <div style={{ marginBottom: '20px' }}>
-                    <ProjectRow projects={hotProjects} name='Рекомендуемые проекты'/>
+                <div style={{ marginBottom: '30px' }}>
+                    <ProjectRow projects={hotProjects} name='Рекомендуемые проекты' />
                 </div>
             )}
             {doneProjects.length > 0 && (
-                <div style={{ marginBottom: '20px' }}>
-                    <ProjectRow projects={doneProjects} name='Завершенные проекты'/>
+                <div style={{ marginBottom: '30px' }}>
+                    <ProjectRow projects={doneProjects} name='Завершенные проекты' />
                 </div>
             )}
             {inProgressProjects.length > 0 && (
-                <div style={{ marginBottom: '20px' }}>
-                    <ProjectRow projects={inProgressProjects} name='Проекты в процессе'/>
+                <div style={{ marginBottom: '30px' }}>
+                    <ProjectRow projects={inProgressProjects} name='Проекты в процессе' />
                 </div>
             )}
         </>
