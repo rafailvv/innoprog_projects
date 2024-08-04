@@ -10,11 +10,12 @@ import CheckPoint from './pages/CheckPoint'
 import {observer} from 'mobx-react-lite'
 
 
+
 function App() {
-    const unauthRoutes = [
+    const routers = [
         {
             path: "/",
-            element: <Navigate to="/login"/>
+            element: <Navigate to="/projects"/>
         },
         {
             path: "/login",
@@ -23,12 +24,6 @@ function App() {
         {
             path: "/register",
             element: <Register/>
-        },
-    ]
-    const authRoutes = [
-        {
-            path: "/",
-            element: <Navigate to="/projects"/>
         },
         {
             path: "/projects",
@@ -43,12 +38,12 @@ function App() {
             element: <CheckPoint/>
         }
     ]
-    const router = createBrowserRouter(localStorage.getItem('token') ? authRoutes : unauthRoutes)
     const {store} = useContext(Context)
+    const router = createBrowserRouter(routers)
     useEffect(() => {
-        // console.log("useEffect")
-        if (localStorage.getItem('token'))
+        if (localStorage.getItem('token')) {
             store.checkAuth();
+        }
     }, [])
     return (
         <>
