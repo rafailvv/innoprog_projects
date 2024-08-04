@@ -20,10 +20,6 @@ export default class Store {
         this.user = user
     }
 
-    setProfile(profile: UserItem) {
-        this.profile = profile
-    }
-
     setBadRequest(badRequest: any) {
         this.badRequest = badRequest
         console.log(badRequest)

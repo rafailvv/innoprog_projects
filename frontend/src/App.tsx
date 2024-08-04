@@ -36,6 +36,10 @@ function App() {
         {
             path: "/projects/:projectId/:checkPointId",
             element: <CheckPoint/>
+        },
+        {
+            path: "*",
+            element: <Navigate to="/projects"/>
         }
     ]
     const {store} = useContext(Context)
