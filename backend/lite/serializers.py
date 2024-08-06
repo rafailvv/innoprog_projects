@@ -180,3 +180,6 @@ class FeedbackRequestSerializer(serializers.ModelSerializer):
 class ValueSerializer(serializers.Serializer):
     value = serializers.IntegerField(required=True,validators=[MinValueValidator(-1), MaxValueValidator(1)])
 
+class UserOtherSubmissionsSerializer(serializers.Serializer):
+    user_submissions = serializers.ListField(child=SubmissionSerializer())
+    other_submissions = serializers.ListField(child=SubmissionSerializer())

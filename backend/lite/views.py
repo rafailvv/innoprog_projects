@@ -10,7 +10,8 @@ from rest_framework.decorators import api_view, permission_classes
 from .models import User, Project, Checkpoint, Submission, Feedback, Company
 from .serializers import ProjectSerializer, UserSerializer, LoginSerializer, UserTgSerializer, CheckpointSerializer, \
     CheckpointRequestSerializer, SubmissionSerializer, SubmissionRequestSerializer, FeedbackSerializer, \
-    FeedbackRequestSerializer, CompanySerializer, UserUpdateSerializer, UserUpdatePasswordSerializer, ValueSerializer
+    FeedbackRequestSerializer, CompanySerializer, UserUpdateSerializer, UserUpdatePasswordSerializer, ValueSerializer, \
+    UserOtherSubmissionsSerializer
 
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -78,7 +79,6 @@ def login_view(request):
                 return Response({'error': 'Неверный логин или пароль'}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 
 @swagger_auto_schema(
@@ -407,7 +407,7 @@ def checkpoint_project_view(request, project_id):
     manual_parameters=[
         openapi.Parameter("id", openapi.IN_PATH, description="id checkpoint", type=openapi.TYPE_INTEGER)],
     responses={
-        status.HTTP_200_OK: SubmissionSerializer,
+        status.HTTP_200_OK: UserOtherSubmissionsSerializer,
         status.HTTP_400_BAD_REQUEST: 'Bad request',
         status.HTTP_401_UNAUTHORIZED: 'Пользователь не авторизирован'
     }
@@ -474,9 +474,20 @@ def submission_view(request, id):
     if request.method == 'GET':
         try:
             checkpoint = Checkpoint.objects.get(pk=id)
-            submissions = Submission.objects.filter(checkpoint=checkpoint).filter(user=user).all()
-            serializer = SubmissionSerializer(submissions, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            submissions = Submission.objects.filter(checkpoint=checkpoint).order_by('-date_time').all()
+
+            user_submissions = [submission for submission in submissions if submission.user == user]
+            other_submissions = [submission for submission in submissions if submission.user != user]
+
+            user_submissions_serializer = SubmissionSerializer(user_submissions, many=True)
+            other_submissions_serializer = SubmissionSerializer(other_submissions, many=True)
+
+            response_data = {
+                'user_submissions': user_submissions_serializer.data,
+                'other_submissions': other_submissions_serializer.data
+            }
+
+            return Response(response_data, status=status.HTTP_200_OK)
         except Checkpoint.DoesNotExist:
             return JsonResponse({'error': 'Чекпоинт не найден'}, status=status.HTTP_400_BAD_REQUEST)
 
