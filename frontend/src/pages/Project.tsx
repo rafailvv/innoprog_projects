@@ -122,7 +122,7 @@ function Project() {
                     </Typography>
                 </AccordionDetails>
             </Accordion>
-            <Accordion defaultExpanded>
+            {/* <Accordion defaultExpanded>
                 <AccordionSummary
                     expandIcon={<ArrowDropDownIcon />}
                     aria-controls="panel2-content"
@@ -141,7 +141,7 @@ function Project() {
                         })
                     }
                 </AccordionDetails>
-            </Accordion>
+            </Accordion> */}
         </Box>
     );
 }

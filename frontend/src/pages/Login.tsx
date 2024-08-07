@@ -93,7 +93,7 @@ const Login: FC = () => {
                 <Typography variant="body2" sx={{marginBottom: '10px'}}>
                     Нет акаунта?{' '}
                     <Link
-                        component="button"
+                        // component="button"
                         variant="body2"
                         onClick={() => navigator("/register")}
                         sx={{
