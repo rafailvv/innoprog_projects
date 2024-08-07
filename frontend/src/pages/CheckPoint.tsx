@@ -3,8 +3,6 @@ import { useEffect, useState } from "react";
 import { CheckPointItem, FeedbackItem, ProjectItem, SubmissionItem } from "../models/types";
 import { useLocation, useNavigate } from "react-router-dom";
 import ApiService from "../services/ApiService";
-import LikeBtn from "../components/LikeBtn";
-import DislikeBtn from "../components/DislikeBtn";
 import Feedback from "../components/Feedback";
 import Submission from "../components/Submission";
 

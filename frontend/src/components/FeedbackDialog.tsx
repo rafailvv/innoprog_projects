@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Slider, TextField } from "@mui/material"
+import { Button, Dialog, DialogContent, DialogTitle, Slider, TextField } from "@mui/material"
 import { useState } from "react";
 import { FeedbackRequest } from "../models/types";
 import ApiService from "../services/ApiService";
@@ -61,7 +61,7 @@ function FeedbackDialog(props: SimpleDialogProps) {
                     value={grade}
                     step={1} min={1} max={5}
                     valueLabelDisplay="on"
-                    onChange={(e, value) => setGrade(value as number)} />
+                    onChange={(_, value) => setGrade(value as number)} />
                 <Button fullWidth variant="contained" type="submit" onClick={sendFeedback}>Отправить</Button>
             </DialogContent>
             {/* <DialogActions>

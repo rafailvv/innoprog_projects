@@ -22,7 +22,7 @@ function Project() {
             for (let point of response.data) {
                 ApiService.getSubmissionsByCheckPointId(point.id).then(response => {
                     console.log(response.data)
-                    setSubmissions([...submissions, ...response.data])
+                    setSubmissions([...submissions, ...response.data.user_submissions])
                 })
             }
         })
