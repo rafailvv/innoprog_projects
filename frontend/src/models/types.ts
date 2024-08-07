@@ -55,6 +55,11 @@ export interface FeedbackItem {
     dislike: number
 }
 
+export interface FeedbackRequest {
+    grade: number
+    comment: string
+}
+
 export interface AuthResponse {
     access: string
     refresh: string

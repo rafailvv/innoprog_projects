@@ -5,6 +5,7 @@ import {
     CheckPointItem,
     CompanyItem,
     FeedbackItem,
+    FeedbackRequest,
     ProjectItem,
     SubmissionItem,
     UserItem
@@ -55,7 +56,7 @@ export default class ApiService {
     static async getCompanyById(id: number): Promise<AxiosResponse<CompanyItem>> {
         return $api.get(`/company/${id}/`)
     }
-    static async getSubmissionsByCheckPointId(id: number): Promise<AxiosResponse<SubmissionItem[]>> {
+    static async getSubmissionsByCheckPointId(id: number): Promise<AxiosResponse<{user_submissions: SubmissionItem[], other_submissions: SubmissionItem[]}>> {
         return $api.get(`/submission/${id}/`)
     }
     static async getFeedbacksBySubmissionId(id: number): Promise<AxiosResponse<FeedbackItem[]>> {
@@ -70,6 +71,9 @@ export default class ApiService {
     }
     static async postDislikeByFeedbackId(id: number, value: number): Promise<AxiosResponse<FeedbackItem>> {
         return $api.post(`/feedback/dislike/${id}/`, {"value": value})
+    }
+    static async postFeedbackBySubmissionId(id: number, feedbackRequest: FeedbackRequest): Promise<AxiosResponse<FeedbackItem>> {
+        return $api.post(`/feedback/${id}/`, {"grade": feedbackRequest.grade, "comment": feedbackRequest.comment})
     }
 
     static async getRefresh() {

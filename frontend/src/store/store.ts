@@ -38,6 +38,8 @@ export default class Store {
         }catch (err: any) {
             console.error(err.response?.data);
             this.setAuth(false);
+            localStorage.removeItem('refresh');
+            localStorage.removeItem('token');
             if (err.response?.status === 400) {
                 this.setBadRequest(err.response.data);
             }
