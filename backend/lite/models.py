@@ -34,37 +34,6 @@ class CompanyField(models.TextChoices):
     SPORTS = 'sports', 'Спорт'
     ART = 'art', 'Искусство'
 
-
-class User(AbstractUser):
-    phone = models.CharField(max_length=100, blank=True, null=True)
-    github = models.CharField(max_length=100, blank=True, null=True)
-    telegram_username = models.CharField(max_length=100, blank=True, null=True)
-    telegram_id = models.BigIntegerField(null=True, blank=True)
-    photo_fase = models.ImageField(upload_to='avatar_logo/', null=True, blank=True)
-    teacher = models.BooleanField(default=False)
-    position = models.CharField(max_length=100, default="")
-
-    @property
-    def positive_feedback_rate(self):
-        feedbacks = Feedback.objects.filter(user=self)
-        valid_feedbacks = feedbacks.exclude(like=0, dislike=0)
-        positive_feedbacks = valid_feedbacks.filter(like=1).count()
-        total_feedbacks = valid_feedbacks.count()
-        if total_feedbacks == 0:
-            return None
-        return (positive_feedbacks / total_feedbacks) * 100
-
-    @property
-    def average_feedback_score(self):
-        feedbacks = Feedback.objects.filter(submission__user=self)
-        if feedbacks.exists():
-            return round(feedbacks.aggregate(average_score=Avg('grade'))['average_score'],2)
-        return None
-
-    def __str__(self):
-        return self.username
-
-
 class Company(models.Model):
     name = models.CharField(max_length=100)
     logo = models.ImageField(upload_to='companies/')
@@ -88,6 +57,7 @@ class Project(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(max_length=1000)
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
+    like = models.IntegerField(default=0)
     price = models.PositiveIntegerField()
     file = models.FileField(upload_to='project_files/', blank=True, null=True)
     code_structure = models.TextField(max_length=1000)
@@ -104,6 +74,36 @@ class Project(models.Model):
     class Meta:
         verbose_name = 'Проект'
         verbose_name_plural = 'Проекты'
+
+class User(AbstractUser):
+    phone = models.CharField(max_length=100, blank=True, null=True)
+    github = models.CharField(max_length=100, blank=True, null=True)
+    telegram_username = models.CharField(max_length=100, blank=True, null=True)
+    telegram_id = models.BigIntegerField(null=True, blank=True)
+    photo_fase = models.ImageField(upload_to='avatar_logo/', null=True, blank=True)
+    teacher = models.BooleanField(default=False)
+    position = models.CharField(max_length=100, default="")
+    projects = models.ManyToManyField(Project, related_name='users')
+
+    @property
+    def positive_feedback_rate(self):
+        feedbacks = Feedback.objects.filter(user=self)
+        valid_feedbacks = feedbacks.exclude(like=0, dislike=0)
+        positive_feedbacks = valid_feedbacks.filter(like=1).count()
+        total_feedbacks = valid_feedbacks.count()
+        if total_feedbacks == 0:
+            return None
+        return (positive_feedbacks / total_feedbacks) * 100
+
+    @property
+    def average_feedback_score(self):
+        feedbacks = Feedback.objects.filter(submission__user=self)
+        if feedbacks.exists():
+            return round(feedbacks.aggregate(average_score=Avg('grade'))['average_score'],2)
+        return None
+
+    def __str__(self):
+        return self.username
 
 
 class Checkpoint(models.Model):

@@ -20,6 +20,7 @@ urlpatterns = [
     path("project/hot/", projects_hot_view, name='projects_hot'),
     path("project/in-progress/", projects_in_progress_view, name='projects_in_progress'),
     path("project/done/", projects_done_view, name='projects_done'),
+    path("project/execution/<int:id>/", project_execution_view, name='project_execution'),
 
     path("checkpoint/<int:project_id>/", checkpoint_project_view, name='checkpoint_project'),
     path("checkpoint/<int:id>/", checkpoint_view, name='checkpoint'),
