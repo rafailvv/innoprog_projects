@@ -901,29 +901,6 @@ def company_view(request, id):
     except Company.DoesNotExist:
         return JsonResponse({'error': 'Компания не найдена'}, status=status.HTTP_400_BAD_REQUEST)
 
-
-@swagger_auto_schema(
-    operation_summary="Начало проекта пользователя",
-    method='POST',
-    responses={
-        status.HTTP_201_CREATED: ProjectSerializer,
-        status.HTTP_400_BAD_REQUEST: 'Bad request',
-        status.HTTP_401_UNAUTHORIZED: 'Пользователь не авторизирован'
-    }
-)
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def project_execution_view(request,id):
-    try:
-        project = Project.objects.get(pk=id)
-        user = request.user
-        user.projects.add(project)
-        serializer = ProjectSerializer(user.projects,many=True)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-    except Project.DoesNotExist:
-        return JsonResponse({'error': 'Проект не найден'}, status=status.HTTP_400_BAD_REQUEST)
-
-
 @swagger_auto_schema(
     operation_summary="Пользователь удалил проект",
     method='DELETE',
@@ -935,13 +912,36 @@ def project_execution_view(request,id):
         status.HTTP_401_UNAUTHORIZED: 'Пользователь не авторизирован'
     }
 )
-@api_view(['DELETE'])
+
+@swagger_auto_schema(
+    operation_summary="Начало проекта пользователя",
+    method='POST',
+    responses={
+        status.HTTP_201_CREATED: ProjectSerializer,
+        status.HTTP_400_BAD_REQUEST: 'Bad request',
+        status.HTTP_401_UNAUTHORIZED: 'Пользователь не авторизирован'
+    }
+)
+@api_view(['POST','DELETE'])
 @permission_classes([IsAuthenticated])
 def project_execution_view(request,id):
-    try:
-        project = Project.objects.get(pk=id)
-        user = request.user
-        user.projects.remove(project)
-        return Response(status=status.HTTP_204_NO_CONTENT)
-    except Project.DoesNotExist:
-        return JsonResponse({'error': 'Проект не найден'}, status=status.HTTP_400_BAD_REQUEST)
+    if request.method == 'POST':
+        try:
+            project = Project.objects.get(pk=id)
+            user = request.user
+            user.projects.add(project)
+            serializer = ProjectSerializer(user.projects,many=True)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except Project.DoesNotExist:
+            return JsonResponse({'error': 'Проект не найден'}, status=status.HTTP_400_BAD_REQUEST)
+    if request.method == "DELETE":
+        try:
+            project = Project.objects.get(pk=id)
+            user = request.user
+            user.projects.remove(project)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except Project.DoesNotExist:
+            return JsonResponse({'error': 'Проект не найден'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
