@@ -726,55 +726,55 @@ def dislike_feedback_view(request, id):
         status.HTTP_401_UNAUTHORIZED: 'Пользователь не авторизирован'
     }
 )
-@api_view(['GET', 'POST', 'DELETE', 'PUT'])
-@permission_classes([IsAuthenticated])
+@api_view(['GET', 'POST', 'DELETE', 'PUT'])# здесь указаны запросы пут-обновить, делит-удалить, гет-получить, пост отправить
+@permission_classes([IsAuthenticated]) # проверка авторизации IsAuthenticated(имортировали), permission_classes-метод(импортировали)
 def feedback_view(request, id):
-    user = request.user
-    if request.method == 'POST':
+    user = request.user # находим пользователя
+    if request.method == 'POST': # метод отправляет запрос в базу данных с обратной связи
         try:
-            submission = Submission.objects.get(pk=id)
-            if Feedback.objects.filter(user=user, submission=submission).exists():
-                return JsonResponse({'error': 'Вы уже оставляли отзыв'}, status=status.HTTP_400_BAD_REQUEST)
+            submission = Submission.objects.get(pk=id) # получает объект с базы данных по id(строчка в таблице)
+            if Feedback.objects.filter(user=user, submission=submission).exists(): # запрос в базу данных, чтоб получить обратную связь по решению и по пользователю(тому кто оставляет обратную связь) exists-существует и проверят существует ли этот комментарий от этого пользователя и оставлял ли он его раннеее
+                return JsonResponse({'error': 'Вы уже оставляли отзыв'}, status=status.HTTP_400_BAD_REQUEST) #если комментарий повторился, выдаем ошибку
 
-            request.data["date_time"] = datetime.datetime.now()
-            serializer = FeedbackSerializer(data=request.data)
-            if serializer.is_valid():
-                serializer.save(user=user, submission=submission)
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        except Project.DoesNotExist:
-            return JsonResponse({'error': 'Проект не найден'}, status=status.HTTP_400_BAD_REQUEST)
+            request.data["date_time"] = datetime.datetime.now() # now-сейчас, фиксируем текущее время
+            serializer = FeedbackSerializer(data=request.data) # строка для базы данных
+            if serializer.is_valid(): # если все данные соблюдены
+                serializer.save(user=user, submission=submission) # сохранение в базу данных
+                return Response(serializer.data, status=status.HTTP_201_CREATED) # подтверждение что сохранение прошло успешно
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) # если пропустил строчку выдаст ошибку
+        except Submission.DoesNotExist: # если недостоверная информация, выдаст ошибку
+            return JsonResponse({'error': 'Проект не найден'}, status=status.HTTP_400_BAD_REQUEST) # само окно ошибки
 
     if request.method == 'GET':
         try:
-            submission = Submission.objects.get(pk=id)
-            feedbacks = Feedback.objects.filter(submission=submission).order_by("-date_time").all()
-            serializer = FeedbackSerializer(feedbacks, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except Submission.DoesNotExist:
+            submission = Submission.objects.get(pk=id) # достает из базы ссылку которую оставлял ранее
+            feedbacks = Feedback.objects.filter(submission=submission).order_by("-date_time").all() # достает все комментарии и сортирует по дате
+            serializer = FeedbackSerializer(feedbacks, many=True)# комментарий и оценка преподователей(так как несколько преподователей пишем many=true), фидбек -список всех моделей
+            return Response(serializer.data, status=status.HTTP_200_OK) #выводит все комментарии Response-ответ
+        except Submission.DoesNotExist: # DoesNotExist -не существует
             return JsonResponse({'error': 'Запись не найдена'}, status=status.HTTP_400_BAD_REQUEST)
 
     if request.method == 'PUT':
         try:
-            feedback = Feedback.objects.get(pk=id)
-            if feedback.user != user:
-                return JsonResponse({'error': 'Недостаточно прав'}, status=status.HTTP_403_FORBIDDEN)
-            serializer = FeedbackSerializer(feedback, data=request.data, partial=True)
-            if serializer.is_valid():
-                serializer.save(user=user)
+            feedback = Feedback.objects.get(pk=id) # находим обьект по йд
+            if feedback.user != user: # проверят подходит ли комментарий к текущему пользователю
+                return JsonResponse({'error': 'Недостаточно прав'}, status=status.HTTP_403_FORBIDDEN) # если нет. выдает ошибку
+            serializer = FeedbackSerializer(feedback, data=request.data, partial=True) # partial-чистично,
+            if serializer.is_valid():# valid-остоверность ( если пользователь ввел правильные данные)
+                serializer.save(user=user) # сохранения данных пользователя
                 return Response(serializer.data, status=status.HTTP_200_OK)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        except Feedback.DoesNotExist:
-            return JsonResponse({'error': 'Отзыв не найден'}, status=status.HTTP_404_NOT_FOUND)
+        except Feedback.DoesNotExist: # если фидбек(см.модель) не найдена
+            return JsonResponse({'error': 'Отзыв не найден'}, status=status.HTTP_404_NOT_FOUND) # ошибка,
 
     if request.method == 'DELETE':
         try:
-            feedback = Feedback.objects.get(pk=id)
+            feedback = Feedback.objects.get(pk=id) # Feedback - обратная связь
             if feedback.user != user:
                 return JsonResponse({'error': 'Недостаточно прав'}, status=status.HTTP_403_FORBIDDEN)
-            feedback.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        except Feedback.DoesNotExist:
+            feedback.delete() #  Feedback даёт команду удалить комментарий
+            return Response(status=status.HTTP_204_NO_CONTENT) # удаление прошло успешно
+        except Feedback.DoesNotExist: # если фидбек(см.модель) не найдена
             return JsonResponse({'error': 'Отзыв не найден'}, status=status.HTTP_404_NOT_FOUND)
 
 
@@ -823,7 +823,7 @@ def projects_done_view(request):
 @permission_classes([IsAuthenticated])
 def projects_in_progress_view(request):
     user = request.user
-    all_projects = Project.objects.all().order_by('-id')
+    all_projects = user.projects
     in_progress_projects = []
     for project in all_projects:
         checkpoints = Checkpoint.objects.filter(project=project)
@@ -900,3 +900,48 @@ def company_view(request, id):
         return Response(serializer.data, status=status.HTTP_200_OK)
     except Company.DoesNotExist:
         return JsonResponse({'error': 'Компания не найдена'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@swagger_auto_schema(
+    operation_summary="Начало проекта пользователя",
+    method='POST',
+    responses={
+        status.HTTP_201_CREATED: ProjectSerializer,
+        status.HTTP_400_BAD_REQUEST: 'Bad request',
+        status.HTTP_401_UNAUTHORIZED: 'Пользователь не авторизирован'
+    }
+)
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def project_execution_view(request,id):
+    try:
+        project = Project.objects.get(pk=id)
+        user = request.user
+        user.projects.add(project)
+        serializer = ProjectSerializer(user.projects,many=True)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    except Project.DoesNotExist:
+        return JsonResponse({'error': 'Проект не найден'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@swagger_auto_schema(
+    operation_summary="Пользователь удалил проект",
+    method='DELETE',
+    manual_parameters=[
+        openapi.Parameter("id", openapi.IN_PATH, description="id Project", type=openapi.TYPE_INTEGER)],
+    responses={
+        status.HTTP_204_NO_CONTENT: "no content",
+        status.HTTP_400_BAD_REQUEST: 'Bad request',
+        status.HTTP_401_UNAUTHORIZED: 'Пользователь не авторизирован'
+    }
+)
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def project_execution_view(request,id):
+    try:
+        project = Project.objects.get(pk=id)
+        user = request.user
+        user.projects.remove(project)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    except Project.DoesNotExist:
+        return JsonResponse({'error': 'Проект не найден'}, status=status.HTTP_400_BAD_REQUEST)
