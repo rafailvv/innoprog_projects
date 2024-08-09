@@ -825,16 +825,7 @@ def projects_in_progress_view(request):
     user = request.user
     all_projects = user.projects.all()
     in_progress_projects = []
-    for project in all_projects:
-        checkpoints = Checkpoint.objects.filter(project=project)
-
-        for checkpoint in checkpoints:
-            submissions = Submission.objects.filter(checkpoint=checkpoint, user=user, accepted=False)
-            if submissions.exists():
-                in_progress_projects.append(project)
-                break
-
-    serializer = ProjectSerializer(in_progress_projects, many=True)
+    serializer = ProjectSerializer(all_projects, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
