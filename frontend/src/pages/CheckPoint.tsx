@@ -3,8 +3,6 @@ import { useEffect, useState } from "react";
 import { CheckPointItem, FeedbackItem, ProjectItem, SubmissionItem } from "../models/types";
 import { useLocation, useNavigate } from "react-router-dom";
 import ApiService from "../services/ApiService";
-import LikeBtn from "../components/LikeBtn";
-import DislikeBtn from "../components/DislikeBtn";
 import Feedback from "../components/Feedback";
 import Submission from "../components/Submission";
 
@@ -43,7 +41,10 @@ function CheckPoint() {
             .then(response => {
                 console.log(response.data)
                 setUserSubmissions(response.data.user_submissions)
-                setOtherSubmissions(response.data.other_submissions.filter(sub => sub.accepted))
+                // if(response.data.user_submissions.length > 0) {
+                //     setSubmissionText(response.data.user_submissions[0].github)
+                // }
+                setOtherSubmissions(response.data.other_submissions.filter(sub => sub.accepted && sub.is_visible))
             })
             .catch(err => console.error(err));
 
@@ -81,6 +82,13 @@ function CheckPoint() {
                 )}
             </List>
 
+            <Typography variant="h6" fontWeight={"bold"}>Мои решения</Typography>
+            <List>
+                {userSubmissions?.map((value) =>
+                    <Typography key={value.id}>{value.github}</Typography>
+                )}
+            </List>
+
             <Typography variant="h6" fontWeight={"bold"}>Чужие решения</Typography>
             <List>
                 {otherSubmissions?.map((value) =>
@@ -88,9 +96,16 @@ function CheckPoint() {
                 )}
             </List>
 
-            <Typography variant="h5" gutterBottom>Ссылка на гит/файл</Typography>
+            <Typography variant="h5" gutterBottom>Ссылка на код решения</Typography>
 
-            <TextField id="standard-basic" label="Git" variant="outlined" value={submissionText} onChange={(e) => setSubmissionText(e.target.value)} />
+            <TextField id="standard-basic"
+                // disabled={userSubmissions?.length !== 0}
+                fullWidth
+                label="Git"
+                variant="outlined"
+                value={submissionText}
+                onChange={(e) => setSubmissionText(e.target.value)}
+            />
             <Box display="flex" flexDirection="column" gap="10px" margin="10px">
                 <Tooltip title="Чтобы завершить решение, необходимо, чтобы был оставлено хотя бы два отзыва с оценкой 4 или 5">
 

@@ -5,7 +5,7 @@ import { useState } from "react";
 
 function Submission({ submission }: { submission: SubmissionItem }) {
     const [open, setOpen] = useState(false);
-    function closeFeedbackDialog(value: FeedbackRequest): void {
+    function closeFeedbackDialog(_: FeedbackRequest): void {
         setOpen(false);
     }
 
