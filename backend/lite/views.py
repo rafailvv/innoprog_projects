@@ -823,7 +823,7 @@ def projects_done_view(request):
 @permission_classes([IsAuthenticated])
 def projects_in_progress_view(request):
     user = request.user
-    all_projects = user.projects
+    all_projects = user.projects.all()
     in_progress_projects = []
     for project in all_projects:
         checkpoints = Checkpoint.objects.filter(project=project)
