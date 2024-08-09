@@ -76,4 +76,5 @@ export interface UserItem {
     telegram_username: string
     telegram_id: number
     photo_fase : string
+    teacher: boolean
 }

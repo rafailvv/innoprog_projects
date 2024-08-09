@@ -44,7 +44,7 @@ function CheckPoint() {
                 // if(response.data.user_submissions.length > 0) {
                 //     setSubmissionText(response.data.user_submissions[0].github)
                 // }
-                setOtherSubmissions(response.data.other_submissions.filter(sub => sub.accepted && sub.is_visible))
+                setOtherSubmissions(response.data.other_submissions.filter(sub => sub.accepted && sub.is_visible || sub.user.teacher))
             })
             .catch(err => console.error(err));
 
@@ -111,7 +111,7 @@ function CheckPoint() {
 
                     <Button variant="contained" onClick={() => {
                         if (checkPoint === undefined) return;
-                        ApiService.postSubmissionByCheckPointId(checkPoint?.id, "test", submissionText)
+                        ApiService.postSubmissionByCheckPointId(checkPoint?.id, submissionText, "test")
                             .then(response => {
                                 console.log(response.data);
                             }).catch(err => console.error(err));
