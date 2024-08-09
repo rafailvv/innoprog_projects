@@ -11,7 +11,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['username', 'password', 'first_name', 'last_name', 'email', 'phone', 'github', 'telegram_username',
-                  'telegram_id']
+                  'telegram_id', 'teacher']
         extra_kwargs = {
             'first_name': {'required': True},
             'last_name': {'required': True},
@@ -20,6 +20,7 @@ class UserSerializer(serializers.ModelSerializer):
             'github': {'required': False},
             'telegram_username': {'required': False},
             'telegram_id': {'required': False},
+            'teacher' : {'required': False},
             'password': {'write_only': True}
         }
 
