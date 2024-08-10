@@ -8,7 +8,7 @@ export interface ProjectItem {
     assessment_criteria: string
     company: CompanyItem
     difficulty: Difficulty,
-    users_in_progress_count : number,
+    users_in_progress : string,
 }
 export enum Difficulty {
     easy = "easy",
@@ -42,6 +42,7 @@ export interface SubmissionItem {
     date_time: string
     is_visible: boolean
     accepted: boolean
+    name: string
 }
 
 export interface FeedbackItem {

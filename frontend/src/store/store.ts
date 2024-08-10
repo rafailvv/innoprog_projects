@@ -40,6 +40,7 @@ export default class Store {
             this.setAuth(false);
             localStorage.removeItem('refresh');
             localStorage.removeItem('token');
+            window.location.reload();
             if (err.response?.status === 400) {
                 this.setBadRequest(err.response.data);
             }

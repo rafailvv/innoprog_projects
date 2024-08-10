@@ -1,10 +1,12 @@
-import { Box, Button, List, TextField, Tooltip, Typography } from "@mui/material";
+import { Badge, Box, Button, Chip, Container, List, Paper, Stack, Switch, TextField, Tooltip, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { CheckPointItem, FeedbackItem, ProjectItem, SubmissionItem } from "../models/types";
 import { useLocation, useNavigate } from "react-router-dom";
 import ApiService from "../services/ApiService";
 import Feedback from "../components/Feedback";
 import Submission from "../components/Submission";
+import Header from "../components/Header";
+import { Circle } from "@mui/icons-material";
 
 interface Like {
     count: number;
@@ -21,6 +23,8 @@ function CheckPoint() {
     const innerCheckpointId = useLocation().state.id;
 
     const [likes, setLikes] = useState<Like[]>([]);
+
+    const [solutionsToggle, setSolutionsToggle] = useState<number>(0);
 
 
     useEffect(() => {
@@ -68,62 +72,88 @@ function CheckPoint() {
     // console.log(innerCheckpointId)
     const navigator = useNavigate();
     return (
-        <>
-            <Button onClick={() => { navigator(-1); }}> Назад</Button>
-            <Typography variant="h4" gutterBottom>{project?.name}</Typography>
-            <Typography variant="h5" fontWeight="bold">Чек-поинт {innerCheckpointId + 1} - {checkPoint?.name}</Typography>
-            <Typography gutterBottom variant="body1">Очков: {checkPoint?.points}</Typography>
-            <Typography variant="h6" fontWeight={"bold"}>Описание</Typography>
-            <Typography gutterBottom variant="body1">{checkPoint?.description}</Typography>
-            <Typography variant="h6" fontWeight={"bold"}>Отзывы</Typography>
-            <List>
-                {feedbacks.map((value) =>
-                    <Feedback key={value.id} feedback={value} />
-                )}
-            </List>
+        <Box>
+            <Header changeProjectsTab={() => { }} />
 
-            <Typography variant="h6" fontWeight={"bold"}>Мои решения</Typography>
-            <List>
-                {userSubmissions?.map((value) =>
-                    <Typography key={value.id}>{value.github}</Typography>
-                )}
-            </List>
+            <Container>
+                <Button onClick={() => { navigator(-1); }}> Проект {project?.name}</Button>
+                {/* <Typography variant="h4" gutterBottom>{project?.name}</Typography> */}
+                <Typography variant="h4" fontWeight="bold">{checkPoint?.name.toUpperCase()}</Typography>
 
-            <Typography variant="h6" fontWeight={"bold"}>Чужие решения</Typography>
-            <List>
-                {otherSubmissions?.map((value) =>
-                    <Submission key={value.id} submission={value} />
-                )}
-            </List>
+                <Box display={'flex'} m={2} >
+                    <Button
+                        sx={{ flex: 1, mr: 2 }}
+                        variant={solutionsToggle == 0 ? 'outlined' : 'contained'}
+                        onClick={() => setSolutionsToggle(0)}
+                    >
+                        мои решения
+                    </Button>
+                    <Button
+                        sx={{ flex: 1, ml: 2 }}
+                        variant={solutionsToggle == 1 ? 'outlined' : 'contained'}
+                        onClick={() => { setSolutionsToggle(1) }}
+                    >
+                        чужие решения
+                    </Button>
+                </Box>
+                <Stack>
+                    {userSubmissions?.map((value) =>
+                        <Paper
+                            key={value.id}
+                            sx={{ p: 1, display: 'flex', alignItems: 'center', gap: 1, backgroundColor: 'primary.light' }}
+                            elevation={0}
+                        >
+                            <Chip label={"3.2"} color="primary" />
+                            <Switch />
+                            <Typography>{value.name}</Typography>
 
-            <Typography variant="h5" gutterBottom>Ссылка на код решения</Typography>
+                        </Paper>
+                    )}
+                </Stack>
 
-            <TextField id="standard-basic"
-                // disabled={userSubmissions?.length !== 0}
-                fullWidth
-                label="Git"
-                variant="outlined"
-                value={submissionText}
-                onChange={(e) => setSubmissionText(e.target.value)}
-            />
-            <Box display="flex" flexDirection="column" gap="10px" margin="10px">
-                <Tooltip title="Чтобы завершить решение, необходимо, чтобы был оставлено хотя бы два отзыва с оценкой 4 или 5">
 
-                    <Button variant="contained" onClick={() => {
-                        if (checkPoint === undefined) return;
-                        ApiService.postSubmissionByCheckPointId(checkPoint?.id, submissionText, "test")
-                            .then(response => {
-                                console.log(response.data);
-                            }).catch(err => console.error(err));
-                        setSubmissionText('');
-                    }}>Проверить</Button>
-                </Tooltip>
-
-                <Button variant="contained" color="success" disabled={feedbacks?.filter(value => value.grade >= 4).length < 2}>
-                    Пройдено
-                </Button>
-            </Box>
-        </>
+                <Typography gutterBottom variant="body1">Очков: {checkPoint?.points}</Typography>
+                <Typography variant="h6" fontWeight={"bold"}>Описание</Typography>
+                <Typography gutterBottom variant="body1">{checkPoint?.description}</Typography>
+                <Typography variant="h6" fontWeight={"bold"}>Отзывы</Typography>
+                <List>
+                    {feedbacks.map((value) =>
+                        <Feedback key={value.id} feedback={value} />
+                    )}
+                </List>
+                
+                <Typography variant="h6" fontWeight={"bold"}>Чужие решения</Typography>
+                <List>
+                    {otherSubmissions?.map((value) =>
+                        <Submission key={value.id} submission={value} />
+                    )}
+                </List>
+                <Typography variant="h5" gutterBottom>Ссылка на код решения</Typography>
+                <TextField id="standard-basic"
+                    // disabled={userSubmissions?.length !== 0}
+                    fullWidth
+                    label="Git"
+                    variant="outlined"
+                    value={submissionText}
+                    onChange={(e) => setSubmissionText(e.target.value)}
+                />
+                <Box display="flex" flexDirection="column" gap="10px" margin="10px">
+                    <Tooltip title="Чтобы завершить решение, необходимо, чтобы был оставлено хотя бы два отзыва с оценкой 4 или 5">
+                        <Button variant="contained" onClick={() => {
+                            if (checkPoint === undefined) return;
+                            ApiService.postSubmissionByCheckPointId(checkPoint?.id, submissionText, "test")
+                                .then(response => {
+                                    console.log(response.data);
+                                }).catch(err => console.error(err));
+                            setSubmissionText('');
+                        }}>Проверить</Button>
+                    </Tooltip>
+                    <Button variant="contained" color="success" disabled={feedbacks?.filter(value => value.grade >= 4).length < 2}>
+                        Пройдено
+                    </Button>
+                </Box>
+            </Container>
+        </Box>
     );
 }
 

@@ -76,6 +76,13 @@ export default class ApiService {
         return $api.post(`/feedback/${id}/`, {"grade": feedbackRequest.grade, "comment": feedbackRequest.comment})
     }
 
+    static async postProjectExecution(id: number): Promise<AxiosResponse<ProjectItem>> {
+        return $api.post(`/project/execution/${id}/`)
+    }
+    static async deleteProjectExecution(id: number): Promise<AxiosResponse<ProjectItem>> {
+        return $api.post(`/project/execution/${id}/`)
+    }
+
     static async getRefresh() {
         return axios.post(`${API_URL}/refresh/`, {"refresh": localStorage.getItem('refresh')})
     }
