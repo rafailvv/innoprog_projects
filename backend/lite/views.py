@@ -9,7 +9,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from .models import User, Project, Checkpoint, Submission, Feedback, Company
 from .serializers import ProjectSerializer, UserSerializer, LoginSerializer, UserTgSerializer, CheckpointSerializer, \
-    CheckpointRequestSerializer, SubmissionSerializer, SubmissionRequestSerializer, FeedbackSerializer, \
+    CheckpointRequestSerializer, SubmissionSerializer, FeedbackSerializer, \
     FeedbackRequestSerializer, CompanySerializer, UserUpdateSerializer, UserUpdatePasswordSerializer, ValueSerializer, \
     UserOtherSubmissionsSerializer
 
@@ -388,6 +388,7 @@ def checkpoint_project_view(request, project_id):
         properties={
             'github': openapi.Schema(type=openapi.TYPE_STRING, description='GitHub URL'),
             'file': openapi.Schema(type=openapi.TYPE_FILE, description='File to upload'),
+            'name': openapi.Schema(type=openapi.TYPE_STRING)
         },
         required=[]
     ),
@@ -461,7 +462,8 @@ def submission_view(request, id):
             data = {
                 'github': request.data.get('github'),
                 'file': request.FILES.get('file'),
-                'date_time': datetime.datetime.now()
+                'date_time': datetime.datetime.now(),
+                'name': request.data.get('name'),
             }
             serializer = SubmissionSerializer(data=data)
             if serializer.is_valid():
@@ -508,7 +510,8 @@ def submission_view(request, id):
                 return JsonResponse({'error': 'Недостаточно прав'}, status=status.HTTP_403_FORBIDDEN)
             data = {
                 'github': request.data.get('github'),
-                'file': request.FILES.get('file')
+                'file': request.FILES.get('file'),
+                'name': request.data.get('name'),
             }
             serializer = SubmissionSerializer(submission, data=data, partial=True)
             if serializer.is_valid():
