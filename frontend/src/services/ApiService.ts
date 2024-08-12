@@ -62,8 +62,8 @@ export default class ApiService {
     static async getFeedbacksBySubmissionId(id: number): Promise<AxiosResponse<FeedbackItem[]>> {
         return $api.get(`/feedback/${id}/`)
     }
-    static async postSubmissionByCheckPointId(id: number, github: string, file: string): Promise<AxiosResponse<any>> {
-        return $api.post(`/submission/${id}/`, {"github": github, "file": file})
+    static async postSubmissionByCheckPointId(id: number, github: string, file: string, name: string): Promise<AxiosResponse<SubmissionItem>> {
+        return $api.post(`/submission/${id}/`, {"github": github, "file": file, "name": name})
     }
 
     static async postLikeByFeedbackId(id: number, value: number): Promise<AxiosResponse<FeedbackItem>> {
@@ -81,6 +81,12 @@ export default class ApiService {
     }
     static async deleteProjectExecution(id: number): Promise<AxiosResponse<ProjectItem>> {
         return $api.post(`/project/execution/${id}/`)
+    }
+    static async postSubmissionOpen(id: number): Promise<AxiosResponse<SubmissionItem>> {
+        return $api.post(`/submission/open/${id}/`)
+    }
+    static async postSubmissionClose(id: number): Promise<AxiosResponse<SubmissionItem>> {
+        return $api.post(`/submission/close/${id}/`)
     }
 
     static async getRefresh() {

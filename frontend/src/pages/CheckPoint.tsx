@@ -7,6 +7,9 @@ import Feedback from "../components/Feedback";
 import Submission from "../components/Submission";
 import Header from "../components/Header";
 import { Circle } from "@mui/icons-material";
+import PaperElement from "../components/PaperElement";
+import PaperSubmission from "../components/PaperSubmission";
+import SubmissionDialog from "../components/SubmissionDialog";
 
 interface Like {
     count: number;
@@ -21,6 +24,8 @@ function CheckPoint() {
     const [feedbacks, setFeedbacks] = useState<FeedbackItem[]>([]);
     const [submissionText, setSubmissionText] = useState('');
     const innerCheckpointId = useLocation().state.id;
+
+    const [submissionDialogOpen, setSubmissionDialogOpen] = useState<boolean>(false);
 
     const [likes, setLikes] = useState<Like[]>([]);
 
@@ -71,6 +76,7 @@ function CheckPoint() {
     // console.log(feedbacks)
     // console.log(innerCheckpointId)
     const navigator = useNavigate();
+
     return (
         <Box>
             <Header changeProjectsTab={() => { }} />
@@ -78,7 +84,10 @@ function CheckPoint() {
             <Container>
                 <Button onClick={() => { navigator(-1); }}> Проект {project?.name}</Button>
                 {/* <Typography variant="h4" gutterBottom>{project?.name}</Typography> */}
-                <Typography variant="h4" fontWeight="bold">{checkPoint?.name.toUpperCase()}</Typography>
+                <Typography variant="h4" fontWeight="bold" gutterBottom>{checkPoint?.name.toUpperCase()}</Typography>
+
+                <PaperElement title="Описание" description={checkPoint?.description} />
+
 
                 <Box display={'flex'} m={2} >
                     <Button
@@ -96,20 +105,19 @@ function CheckPoint() {
                         чужие решения
                     </Button>
                 </Box>
-                <Stack>
+                <Stack sx={{ mb: 2 }}>
                     {userSubmissions?.map((value) =>
-                        <Paper
-                            key={value.id}
-                            sx={{ p: 1, display: 'flex', alignItems: 'center', gap: 1, backgroundColor: 'primary.light' }}
-                            elevation={0}
-                        >
-                            <Chip label={"3.2"} color="primary" />
-                            <Switch />
-                            <Typography>{value.name}</Typography>
-
-                        </Paper>
+                        <PaperSubmission key={value.id} value={value} />
                     )}
                 </Stack>
+
+                <SubmissionDialog open={submissionDialogOpen} onClose={() => setSubmissionDialogOpen(false)} submissionId={checkPoint?.id}/>
+                <Button sx={{ width: '100%' }}
+                    variant="contained"
+                    onClick={() => {setSubmissionDialogOpen(true)}}
+                >
+                    Добавить решение
+                </Button>
 
 
                 <Typography gutterBottom variant="body1">Очков: {checkPoint?.points}</Typography>
@@ -121,7 +129,7 @@ function CheckPoint() {
                         <Feedback key={value.id} feedback={value} />
                     )}
                 </List>
-                
+
                 <Typography variant="h6" fontWeight={"bold"}>Чужие решения</Typography>
                 <List>
                     {otherSubmissions?.map((value) =>
@@ -141,7 +149,7 @@ function CheckPoint() {
                     <Tooltip title="Чтобы завершить решение, необходимо, чтобы был оставлено хотя бы два отзыва с оценкой 4 или 5">
                         <Button variant="contained" onClick={() => {
                             if (checkPoint === undefined) return;
-                            ApiService.postSubmissionByCheckPointId(checkPoint?.id, submissionText, "test")
+                            ApiService.postSubmissionByCheckPointId(checkPoint?.id, submissionText, "test", "test")
                                 .then(response => {
                                     console.log(response.data);
                                 }).catch(err => console.error(err));
