@@ -3,7 +3,7 @@ import { SubmissionItem } from '../models/types'
 import { useState } from 'react'
 import ApiService from '../services/ApiService'
 
-function PaperSubmission({ value }: { value: SubmissionItem }) {
+function PaperSubmission({ value, onChange }: { value: SubmissionItem, onChange: (value: SubmissionItem) => void }) {
     const [is_visible, setIsVisible] = useState<boolean>(value.is_visible)
 
     const changeVisibility = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -13,10 +13,14 @@ function PaperSubmission({ value }: { value: SubmissionItem }) {
                 const resp = await ApiService.postSubmissionClose(value.id)
                 console.log(resp)
                 setIsVisible(false)
+                onChange({ ...value, is_visible: false })
+
             } else {
                 const resp = await ApiService.postSubmissionOpen(value.id)
                 console.log(resp)
                 setIsVisible(true);
+                onChange({ ...value, is_visible: true })
+
             }
         } catch (error) {
             console.error(error);
@@ -25,7 +29,7 @@ function PaperSubmission({ value }: { value: SubmissionItem }) {
     return (
         <Paper
             onClick={() => console.log(value)}
-            sx={{ p: 1, display: 'flex', alignItems: 'center', gap: 1, backgroundColor: 'primary.light' }}
+            sx={{ p: 1, mb: 1, display: 'flex', alignItems: 'center', gap: 1, backgroundColor: 'primary.light' }}
             elevation={0}
         >
             <Chip label={"3.2"} color="primary" />

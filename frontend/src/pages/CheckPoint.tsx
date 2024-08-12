@@ -89,7 +89,7 @@ function CheckPoint() {
                 <PaperElement title="Описание" description={checkPoint?.description} />
 
 
-                <Box display={'flex'} m={2} >
+                <Box display={'flex'} m={2}>
                     <Button
                         sx={{ flex: 1, mr: 2 }}
                         variant={solutionsToggle == 0 ? 'outlined' : 'contained'}
@@ -105,22 +105,30 @@ function CheckPoint() {
                         чужие решения
                     </Button>
                 </Box>
-                <Stack sx={{ mb: 2 }}>
+                <Stack sx={{ mb: 1 }}>
                     {userSubmissions?.map((value) =>
-                        <PaperSubmission key={value.id} value={value} />
+                        <PaperSubmission key={value.id} value={value}
+                            onChange={(value: SubmissionItem) => {
+                                setUserSubmissions(userSubmissions?.map(sub => sub.id == value.id ? value : sub))
+                            }}
+                        />
                     )}
                 </Stack>
 
-                <SubmissionDialog open={submissionDialogOpen} onClose={() => setSubmissionDialogOpen(false)} submissionId={checkPoint?.id}/>
+                <SubmissionDialog open={submissionDialogOpen} onClose={() => setSubmissionDialogOpen(false)} submissionId={checkPoint?.id} />
                 <Button sx={{ width: '100%' }}
                     variant="contained"
-                    onClick={() => {setSubmissionDialogOpen(true)}}
+                    onClick={() => { setSubmissionDialogOpen(true) }}
+                    disabled={userSubmissions?.filter(submission => submission.is_visible).length !== 0}
                 >
                     Добавить решение
                 </Button>
 
 
-                <Typography gutterBottom variant="body1">Очков: {checkPoint?.points}</Typography>
+
+
+
+                {/* <Typography gutterBottom variant="body1">Очков: {checkPoint?.points}</Typography>
                 <Typography variant="h6" fontWeight={"bold"}>Описание</Typography>
                 <Typography gutterBottom variant="body1">{checkPoint?.description}</Typography>
                 <Typography variant="h6" fontWeight={"bold"}>Отзывы</Typography>
@@ -159,7 +167,7 @@ function CheckPoint() {
                     <Button variant="contained" color="success" disabled={feedbacks?.filter(value => value.grade >= 4).length < 2}>
                         Пройдено
                     </Button>
-                </Box>
+                </Box> */}
             </Container>
         </Box>
     );

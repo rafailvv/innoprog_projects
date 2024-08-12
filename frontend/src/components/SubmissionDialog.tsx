@@ -1,4 +1,4 @@
-import { Dialog, TextField, Typography } from '@mui/material'
+import { Button, Dialog, DialogContent, DialogTitle, TextField, Typography } from '@mui/material'
 import { SubmissionItem } from '../models/types';
 import ApiService from '../services/ApiService';
 import { useState } from 'react';
@@ -16,7 +16,7 @@ function SubmissionDialog(props: SimpleDialogProps) {
     const [file, setFile] = useState('');
     const [solutionName, setSolutionName] = useState('');
 
-    const handleClose = async () => {
+    const handleSubmit = async () => {
 
         try {
             if (submissionId !== undefined) {
@@ -27,7 +27,7 @@ function SubmissionDialog(props: SimpleDialogProps) {
                     solutionName
                 )
                 console.log(resp)
-                
+
             }
             onClose();
 
@@ -37,17 +37,50 @@ function SubmissionDialog(props: SimpleDialogProps) {
     };
 
     return (
-        <Dialog open={open} onClose={handleClose}>
-            <Typography variant="h5" fontWeight="bold">
-                Загрузка решения
-            </Typography>
+        <Dialog
+            open={open}
+            onClose={onClose}
+            sx={{ p: 2 }}
+        >
+            <DialogTitle variant="h4" fontWeight="bold">
+                ЗАГРУЗКА РЕШЕНИЯ
+            </DialogTitle>
+            <DialogContent>
 
-            <Typography variant="h6" fontWeight="bold">
-                Ссылка на код решения
-            </Typography>
-            <TextField>
+                <Typography variant="h6" fontWeight="bold">
+                    Название решения
+                </Typography>
+                <TextField
+                    value={solutionName}
+                    onChange={(e) => setSolutionName(e.target.value)}
+                    placeholder='Улучшение функции...'
+                    fullWidth
+                />
+
+                <Typography variant="h6" fontWeight="bold">
+                    Загрузка файла с решением
+                </Typography>
+                <input type="file" onChange={(e) => setFile(e.target.value)} />
                 
-            </TextField>
+
+                <Typography variant="h6" fontWeight="bold">
+                    Ссылка на код решения
+                </Typography>
+                <TextField
+                    value={github}
+                    onChange={(e) => setGithub(e.target.value)}
+                    placeholder='https://...'
+                    fullWidth
+                />
+                <Button
+                    variant="contained"
+                    fullWidth
+                    onClick={handleSubmit}
+                    sx={{ mt: 2, mb: 1 }}
+                >
+                    Опубликовать
+                </Button>
+            </DialogContent>
         </Dialog>
     )
 }
