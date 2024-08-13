@@ -9,6 +9,7 @@ import Project from './pages/Project'
 import CheckPoint from './pages/CheckPoint'
 import { observer } from 'mobx-react-lite'
 import { createTheme, ThemeProvider } from '@mui/material'
+import Submission from './pages/Submission'
 // import Header from './components/Header'
 
 
@@ -18,9 +19,36 @@ const theme = createTheme({
             main: '#9C78FF',
             light: '#EDE1FF'
         },
-        // background: {
-        //     paper: '#EDE1FF'
-        // }
+    },
+    components: {
+        MuiButton: {
+            styleOverrides: {
+                contained: {
+                    borderRadius: 8
+                },
+                outlined: {
+                    borderRadius: 8
+                }
+            }
+        },
+        MuiDialog: {
+            styleOverrides: {
+                paper: {
+                    borderRadius: 10
+                }
+            }
+        },
+        MuiTextField: {
+            styleOverrides: {
+                root: {
+                    backgroundColor: '#EDE1FF',
+                    marginBottom: '4px',
+                    [`& fieldset`]: {
+                        borderRadius: 8,
+                    },
+                }
+            }
+        }
     }
 });
 
@@ -33,7 +61,7 @@ function App() {
         //         <Outlet />
         //     </>,
         //     path:"/",
-            
+
         //     children: [
         //         {
         //             path: "/login",
@@ -90,6 +118,10 @@ function App() {
         {
             path: "/projects/:projectId/:checkPointId",
             element: <CheckPoint />
+        },
+        {
+            path: "/projects/:projectId/:checkPointId/:submissionId",
+            element: <Submission />
         },
         {
             path: "*",

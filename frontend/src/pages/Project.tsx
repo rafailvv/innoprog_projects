@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import ApiService from '../services/ApiService';
 import Header from '../components/Header';
 import { Circle } from '@mui/icons-material';
+import PaperElement from '../components/PaperElement';
 
 function Project() {
     // const checkPoints = 4;
@@ -47,8 +48,8 @@ function Project() {
 
     const toggleExecution = async () => {
         try {
-            if(project == null) return;
-            if(executionStatus == 0) {
+            if (project == null) return;
+            if (executionStatus == 0) {
                 const response = await ApiService.postProjectExecution(project.id)
                 console.log(response);
                 setExecutionStatus(1);
@@ -86,7 +87,28 @@ function Project() {
                     </Button>
                     <Button sx={{ flex: 1, ml: 2 }} variant='contained' onClick={() => { navigator('/projects/create'); }}>Решения других разработчииков</Button>
                 </Box>
-                <Accordion defaultExpanded>
+
+
+                <PaperElement title='Описание' description={project?.description} />
+
+                <PaperElement title='Чек-поинты'>
+                    <List>
+                        {checkPoints?.map((value, i) => <ListItemButton key={value.id} onClick={routeChange(value.id, i)}>
+                            <ListItemIcon>
+                                <DoneIcon color={value.id > 1 ? 'warning' : 'success'}></DoneIcon>
+                            </ListItemIcon>
+                            <ListItemText primary={value.name} />
+                        </ListItemButton>)}
+                    </List>
+                </PaperElement>
+
+                <PaperElement title='Структура' description={project?.code_structure} />
+
+                <PaperElement title='Критерии оценивания' description={project?.assessment_criteria} />
+
+                <PaperElement title='О заказчике' description={project?.company.description} />
+
+                {/* <Accordion defaultExpanded>
                     <AccordionSummary
                         expandIcon={<ArrowDropDownIcon />}
                         aria-controls="panel1-content"
@@ -162,7 +184,7 @@ function Project() {
                             {project?.company.description}
                         </Typography>
                     </AccordionDetails>
-                </Accordion>
+                </Accordion> */}
             </Container>
         </Box>
     );

@@ -1,21 +1,14 @@
 import { FC, useContext, useEffect, useState } from 'react';
 import { Context } from '../main';
 import { observer } from 'mobx-react-lite';
-import { Button, Avatar, Typography, Tabs, Tab, AppBar, Container, Toolbar, Box } from '@mui/material';
+import { Button, Avatar, Typography, Tabs, Tab, AppBar, Toolbar, Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import logo from '../assets/logo_innoprog_projects.svg';
 import { UserItem } from "../models/types.ts";
 import ApiService from "../services/ApiService.ts";
 
 
-function a11yProps(index: number) {
-    return {
-        id: `simple-tab-${index}`,
-        'aria-controls': `simple-tabpanel-${index}`,
-    };
-}
-
-function Header({changeProjectsTab}: {changeProjectsTab: (tab: number) => void}) {
+function Header({changeProjectsTab, disabledTabs}: {changeProjectsTab: (tab: number) => void, disabledTabs?: boolean}) {
     const { store } = useContext(Context);
     const navigator = useNavigate();
     const [profile, setProfile] = useState<UserItem | null>(null);
@@ -57,9 +50,9 @@ function Header({changeProjectsTab}: {changeProjectsTab: (tab: number) => void})
                         centered
                         onChange={(_, newValue) => {setActiveTab(newValue); changeProjectsTab(newValue);}}
                     >
-                        <Tab label="Каталог"/>
-                        <Tab label="В процессе" />
-                        <Tab label="Завершённые" />
+                        <Tab label="Каталог" disabled={disabledTabs}/>
+                        <Tab label="В процессе" disabled={disabledTabs}/>
+                        <Tab label="Завершённые" disabled={disabledTabs}/>
                     </Tabs>
                 </Box>
                 {(store.isAuth && profile !== null) ? (

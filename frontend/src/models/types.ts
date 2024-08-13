@@ -78,4 +78,5 @@ export interface UserItem {
     telegram_id: number
     photo_fase : string
     teacher: boolean
+    position: string
 }
