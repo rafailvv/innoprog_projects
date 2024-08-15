@@ -118,7 +118,7 @@ function CheckPoint() {
                     :
                     <Stack sx={{ mb: 1 }}>
                         {otherSubmissions?.map((value) =>
-                            <PaperSubmission key={value.id} value={value}
+                            <PaperSubmission key={value.id} value={value} externalSubmission
                                 onChange={(value: SubmissionItem) => {
                                     setOtherSubmissions(otherSubmissions?.map(sub => sub.id == value.id ? value : sub))
                                 }}
@@ -126,9 +126,6 @@ function CheckPoint() {
                         )}
                     </Stack>
                 }
-
-
-
             </Container>
         </Box>
     );

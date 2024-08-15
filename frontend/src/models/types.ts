@@ -38,7 +38,7 @@ export interface SubmissionItem {
     user: UserItem
     checkpoint: CheckPointItem
     github: string
-    file: string
+    file: File
     date_time: string
     is_visible: boolean
     accepted: boolean

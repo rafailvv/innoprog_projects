@@ -1,4 +1,4 @@
-import { FC, useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Context } from '../main';
 import { observer } from 'mobx-react-lite';
 import { Button, Avatar, Typography, Tabs, Tab, AppBar, Toolbar, Box } from '@mui/material';
@@ -83,6 +83,6 @@ function Header({changeProjectsTab, disabledTabs}: {changeProjectsTab: (tab: num
             </div>
         </AppBar>
     );
-};
+}
 
 export default observer(Header);

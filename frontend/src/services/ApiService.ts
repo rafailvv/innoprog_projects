@@ -62,7 +62,7 @@ export default class ApiService {
     static async getFeedbacksBySubmissionId(id: number): Promise<AxiosResponse<FeedbackItem[]>> {
         return $api.get(`/feedback/${id}/`)
     }
-    static async postSubmissionByCheckPointId(id: number, github: string, file: string, name: string): Promise<AxiosResponse<SubmissionItem>> {
+    static async postSubmissionByCheckPointId(id: number, github: string, name: string, file?: File): Promise<AxiosResponse<SubmissionItem>> {
         return $api.post(`/submission/${id}/`, {"github": github, "file": file, "name": name})
     }
 

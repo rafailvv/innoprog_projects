@@ -1,5 +1,4 @@
 import { Button, Dialog, DialogContent, DialogTitle, TextField, Typography } from '@mui/material'
-import { SubmissionItem } from '../models/types';
 import ApiService from '../services/ApiService';
 import { useState } from 'react';
 
@@ -13,21 +12,21 @@ export interface SimpleDialogProps {
 function SubmissionDialog(props: SimpleDialogProps) {
     const { open, submissionId, onClose } = props
     const [github, setGithub] = useState('');
-    const [file, setFile] = useState('');
+    const [file, setFile] = useState<File>();
     const [solutionName, setSolutionName] = useState('');
 
     const handleSubmit = async () => {
 
         try {
             if (submissionId !== undefined) {
+                console.log(file)
                 const resp = await ApiService.postSubmissionByCheckPointId(
                     submissionId,
                     github,
-                    file,
-                    solutionName
+                    solutionName,
+                    file
                 )
                 console.log(resp)
-
             }
             onClose();
 
@@ -60,8 +59,10 @@ function SubmissionDialog(props: SimpleDialogProps) {
                 <Typography variant="h6" fontWeight="bold">
                     Загрузка файла с решением
                 </Typography>
-                <input type="file" onChange={(e) => setFile(e.target.value)} />
-                
+                <input type="file" onChange={(e) => {
+                    if(e.target.files)
+                        setFile(e.target.files[0])
+                }} />
 
                 <Typography variant="h6" fontWeight="bold">
                     Ссылка на код решения

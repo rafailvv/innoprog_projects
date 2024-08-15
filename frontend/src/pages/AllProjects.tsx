@@ -1,5 +1,4 @@
 import { FC, useContext, useEffect, useState } from 'react';
-import ProjectRow from '../components/ProjectRow';
 import ProjectGrid from '../components/ProjectGrid';
 import { Context } from '../main';
 import { observer } from 'mobx-react-lite';
@@ -9,7 +8,7 @@ import gearGif from '../assets/gear.gif';
 import Header from '../components/Header';
 
 const AllProjects: FC = () => {
-    const [hotProjects, setHotProjects] = useState<ProjectItem[]>([]);
+    const [_, setHotProjects] = useState<ProjectItem[]>([]);
     const [allProjects, setAllProjects] = useState<ProjectItem[]>([]);
     const [doneProjects, setDoneProjects] = useState<ProjectItem[]>([]);
     const [inProgressProjects, setInProgressProjects] = useState<ProjectItem[]>([]);

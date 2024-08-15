@@ -12,12 +12,17 @@ function Submission() {
 
     const [feedbacks, setFeedbacks] = useState<FeedbackItem[]>([]);
 
+    const onDownload = () => {
+        return;
+    }
+
     useEffect(() => {
         ApiService.getFeedbacksBySubmissionId(submission.id)
-            .then(response => {console.log(response.data); setFeedbacks(response.data);})
+            .then(response => { console.log(response.data); setFeedbacks(response.data); })
             .catch(err => console.error(err));
     }, [])
 
+    console.log(submission)
 
     return (
         <Box>
@@ -34,7 +39,9 @@ function Submission() {
                 />
 
                 <Typography variant="h5" fontWeight={"bold"}>Файл с решением</Typography>
-                <input type="file" disabled />
+                <Button onClick={onDownload} disabled={submission?.file === null} variant="contained" color="primary">
+                    Скачать файл
+                </Button>
 
                 <Typography variant="h5" fontWeight={"bold"}>Ссылка на код решения</Typography>
                 <TextField
