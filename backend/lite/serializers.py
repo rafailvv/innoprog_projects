@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib.auth.password_validation import validate_password
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.db.models import Avg
 from dotenv import dotenv_values
 from rest_framework import serializers
 from .models import Project, User, Checkpoint, Submission, Feedback, Company
@@ -162,10 +163,12 @@ class CheckpointRequestSerializer(serializers.ModelSerializer):
         fields = ['name', 'description', 'points']
 
 
+
 class SubmissionSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
     checkpoint = CheckpointSerializer(read_only=True)
     accepted = serializers.SerializerMethodField()
+    avg_grade = serializers.SerializerMethodField()
 
     class Meta:
         model = Submission
@@ -175,11 +178,16 @@ class SubmissionSerializer(serializers.ModelSerializer):
         feedbacks = Feedback.objects.filter(submission=obj, user__teacher=True, grade__gte=4)
         return feedbacks.count() >= 2
 
+    def get_avg_grade(self, obj):
+        avg_grade = Feedback.objects.filter(submission=obj).aggregate(Avg('grade'))['grade__avg']
+        return avg_grade
+
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         if instance.file:
             representation['file'] = settings.DOMAIN + settings.MEDIA_URL + str(instance.file)
         representation['accepted'] = self.get_accepted(instance)
+        representation['avg_grade'] = self.get_avg_grade(instance)
         return representation
 
 
