@@ -180,7 +180,7 @@ class SubmissionSerializer(serializers.ModelSerializer):
 
     def get_avg_grade(self, obj):
         avg_grade = Feedback.objects.filter(submission=obj).aggregate(Avg('grade'))['grade__avg']
-        return avg_grade
+        return avg_grade if avg_grade is not None else 0
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
