@@ -28,7 +28,7 @@ urlpatterns = [
     path("submission/<int:id>/", submission_view, name='submission'),
     path("submission/close/<int:id>/", close_submission_view, name='submission_close'),
     path("submission/open/<int:id>/", open_submission_view, name='submission_open'),
-    path("submission/accept/<int:id>/", accept_submission_view, name='submission_accept'),
+    # path("submission/accept/<int:id>/", accept_submission_view, name='submission_accept'),
 
     path("feedback/like/<int:id>/", like_feedback_view, name='like_feedback'),
     path("feedback/dislike/<int:id>/", dislike_feedback_view, name='dislike_feedback'),

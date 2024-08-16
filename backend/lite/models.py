@@ -127,7 +127,6 @@ class Submission(models.Model):
     file = models.FileField(upload_to='file_submissions/', blank=True, null=True)
     date_time = models.DateTimeField()
     is_visible = models.BooleanField(default=True)
-    accepted = models.BooleanField(default=False)
     name = models.CharField(max_length=100,null=True)
 
     def __str__(self):

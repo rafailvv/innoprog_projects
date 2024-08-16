@@ -607,7 +607,6 @@ def accept_submission_view(request, id):
             return JsonResponse({
                 'error': 'Перед закрытием решения необходимо, чтобы был оставлено хотя бы два отзыва с оценкой 4 или 5'},
                 status=status.HTTP_400_BAD_REQUEST)
-        submission.accepted = True
         submission.is_visible = False
         submission.save()
         return Response(SubmissionSerializer(submission).data, status=status.HTTP_201_CREATED)
@@ -796,21 +795,22 @@ def projects_done_view(request):
     user = request.user
     all_projects = Project.objects.all().order_by('-id')
     completed_projects = []
+
     for project in all_projects:
         checkpoints = Checkpoint.objects.filter(project=project)
-
         all_checkpoints_done = len(checkpoints) > 0
-        for checkpoint in checkpoints:
-            submissions = Submission.objects.filter(checkpoint=checkpoint, user=user, accepted=True)
-            if not submissions.exists():
+
+        serializer = CheckpointSerializer(checkpoints, many=True, context={'user': user})
+        for checkpoint_data in serializer.data:
+            if not checkpoint_data['is_done']:
                 all_checkpoints_done = False
                 break
 
         if all_checkpoints_done:
             completed_projects.append(project)
 
-    serializer = ProjectSerializer(completed_projects, many=True)
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    project_serializer = ProjectSerializer(completed_projects, many=True)
+    return Response(project_serializer.data, status=status.HTTP_200_OK)
 
 
 @swagger_auto_schema(
@@ -827,7 +827,6 @@ def projects_done_view(request):
 def projects_in_progress_view(request):
     user = request.user
     all_projects = user.projects.all()
-    in_progress_projects = []
     serializer = ProjectSerializer(all_projects, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -851,7 +850,7 @@ def projects_hot_view(request):
         checkpoints = Checkpoint.objects.filter(project=project)
 
         for checkpoint in checkpoints:
-            submissions = Submission.objects.filter(checkpoint=checkpoint, user=user, accepted=False)
+            submissions = Submission.objects.filter(checkpoint=checkpoint, user=user)
             if submissions.exists():
                 break
         else:

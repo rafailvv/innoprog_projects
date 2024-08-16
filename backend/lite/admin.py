@@ -19,9 +19,9 @@ class CheckpointAdmin(admin.ModelAdmin):
 
 @admin.register(Submission)
 class SubmissionAdmin(admin.ModelAdmin):
-    list_display = ('user', 'checkpoint', 'github', 'date_time', 'is_visible', 'accepted')
+    list_display = ('user', 'checkpoint', 'github', 'date_time', 'is_visible')
     search_fields = ('user__username', 'checkpoint__name', 'github')
-    list_filter = ('accepted', 'is_visible', 'date_time')
+    list_filter = ('is_visible', 'date_time')
     ordering = ('-date_time',)
 
 @admin.register(Feedback)

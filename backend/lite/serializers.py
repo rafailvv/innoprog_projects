@@ -68,6 +68,7 @@ class UserSerializer(serializers.ModelSerializer):
         representation['rate'] = instance.positive_feedback_rate
         representation['average_grade'] = instance.average_feedback_score
         return representation
+
 class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -123,7 +124,7 @@ class ProjectSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def get_users_in_progress(self, obj):
-        return Submission.objects.filter(checkpoint__project=obj, accepted=False).values('user').distinct().count()
+        return Submission.objects.filter(checkpoint__project=obj, feedback__grade__lt=4).values('user').distinct().count()
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -145,7 +146,7 @@ class CheckpointSerializer(serializers.ModelSerializer):
         user = self.context.get('user')
         if not user or not user.is_authenticated:
             return False
-        return Submission.objects.filter(checkpoint=obj, user=user, accepted=True).exists()
+        return Submission.objects.filter(checkpoint=obj, user=user, feedback__grade__gte=4).exists()
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -164,14 +165,21 @@ class CheckpointRequestSerializer(serializers.ModelSerializer):
 class SubmissionSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
     checkpoint = CheckpointSerializer(read_only=True)
+    accepted = serializers.SerializerMethodField()
+
     class Meta:
         model = Submission
         fields = '__all__'
+
+    def get_accepted(self, obj):
+        feedbacks = Feedback.objects.filter(submission=obj, user__teacher=True, grade__gte=4)
+        return feedbacks.count() >= 2
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         if instance.file:
             representation['file'] = settings.DOMAIN + settings.MEDIA_URL + str(instance.file)
+        representation['accepted'] = self.get_accepted(instance)
         return representation
 
 
