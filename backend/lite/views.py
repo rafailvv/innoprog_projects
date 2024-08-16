@@ -375,7 +375,7 @@ def checkpoint_project_view(request, project_id):
     try:
         project = Project.objects.get(pk=project_id)
         checkpoints = Checkpoint.objects.filter(project=project).all()
-        serializer = CheckpointSerializer(checkpoints, many=True)
+        serializer = CheckpointSerializer(checkpoints, many=True, context={'user': request.user})
         return Response(serializer.data, status=status.HTTP_200_OK)
     except Project.DoesNotExist:
         return JsonResponse({'error': 'Проект не найден'}, status=status.HTTP_400_BAD_REQUEST)
@@ -799,7 +799,7 @@ def projects_done_view(request):
     for project in all_projects:
         checkpoints = Checkpoint.objects.filter(project=project)
 
-        all_checkpoints_done = True
+        all_checkpoints_done = len(checkpoints) > 0
         for checkpoint in checkpoints:
             submissions = Submission.objects.filter(checkpoint=checkpoint, user=user, accepted=True)
             if not submissions.exists():

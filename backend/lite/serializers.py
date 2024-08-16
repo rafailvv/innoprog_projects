@@ -135,9 +135,24 @@ class ProjectSerializer(serializers.ModelSerializer):
 
 class CheckpointSerializer(serializers.ModelSerializer):
     project = ProjectSerializer()
+    is_done = serializers.SerializerMethodField()
+
     class Meta:
         model = Checkpoint
         fields = '__all__'
+
+    def get_is_done(self, obj):
+        user = self.context.get('user')
+        if not user or not user.is_authenticated:
+            return False
+        return Submission.objects.filter(checkpoint=obj, user=user, accepted=True).exists()
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['is_done'] = self.get_is_done(instance)
+        return representation
+
+
 
 
 class CheckpointRequestSerializer(serializers.ModelSerializer):
