@@ -465,6 +465,9 @@ def submission_view(request, id):
                 'date_time': datetime.datetime.now(),
                 'name': request.data.get('name'),
             }
+            if data['github'] is None and data['file'] is None:
+                return JsonResponse({'error': 'Необходимо указать GitHub URL или загрузить файл'},
+                                    status=status.HTTP_400_BAD_REQUEST)
             serializer = SubmissionSerializer(data=data)
             if serializer.is_valid():
                 serializer.save(user=user, checkpoint=checkpoint)
@@ -513,6 +516,9 @@ def submission_view(request, id):
                 'file': request.FILES.get('file'),
                 'name': request.data.get('name'),
             }
+            if data['github'] is None and data['file'] is None:
+                return JsonResponse({'error': 'Необходимо указать GitHub URL или загрузить файл'},
+                                    status=status.HTTP_400_BAD_REQUEST)
             serializer = SubmissionSerializer(submission, data=data, partial=True)
             if serializer.is_valid():
                 serializer.save(user=user)

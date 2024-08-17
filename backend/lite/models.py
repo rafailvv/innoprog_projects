@@ -123,7 +123,7 @@ class Checkpoint(models.Model):
 class Submission(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     checkpoint = models.ForeignKey(Checkpoint, on_delete=models.CASCADE)
-    github = models.CharField(max_length=100)
+    github = models.CharField(max_length=100, null=True)
     file = models.FileField(upload_to='file_submissions/', blank=True, null=True)
     date_time = models.DateTimeField()
     is_visible = models.BooleanField(default=True)
