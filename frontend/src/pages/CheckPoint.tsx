@@ -1,5 +1,5 @@
 import { Box, Button, Container, Stack, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { CheckPointItem, ProjectItem, SubmissionItem } from "../models/types";
 import { useLocation, useNavigate } from "react-router-dom";
 import ApiService from "../services/ApiService";
@@ -7,9 +7,12 @@ import Header from "../components/Header";
 import PaperElement from "../components/PaperElement";
 import PaperSubmission from "../components/PaperSubmission";
 import SubmissionDialog from "../components/SubmissionDialog";
+import { Context } from "../main";
+import { Circle } from "@mui/icons-material";
 
 
 function CheckPoint() {
+    const { store } = useContext(Context);
     const [project, setProject] = useState<ProjectItem>();
     const [checkPoint, setCheckPoint] = useState<CheckPointItem>();
     const [userSubmissions, setUserSubmissions] = useState<SubmissionItem[]>();
@@ -20,7 +23,7 @@ function CheckPoint() {
 
     const [solutionsToggle, setSolutionsToggle] = useState<number>(0);
     const navigator = useNavigate();
-
+    // console.log(checkPoint)
     const closeSubmissionDialog = () => {
         setSubmissionDialogOpen(false)
         if (!checkPoint) return;
@@ -64,11 +67,15 @@ function CheckPoint() {
 
     return (
         <Box>
-            <Header changeProjectsTab={() => { }}/>
+            <Header />
 
             <Container>
                 <Button onClick={() => { navigator(-1); }}> Проект {project?.name}</Button>
-                <Typography variant="h4" fontWeight="bold" gutterBottom>{checkPoint?.name.toUpperCase()}</Typography>
+                <Box display={'flex'}>
+                    <Circle color={checkPoint?.is_done ? 'success' : 'warning'}
+                        sx={{ mr: 1 }} fontSize="large"/>
+                    <Typography variant="h4" fontWeight="bold" gutterBottom>{checkPoint?.name.toUpperCase()}</Typography>
+                </Box>
 
                 <PaperElement title="Описание" description={checkPoint?.description} />
 
@@ -78,6 +85,7 @@ function CheckPoint() {
                         sx={{ flex: 1, mr: 2 }}
                         variant={solutionsToggle == 0 ? 'outlined' : 'contained'}
                         onClick={() => setSolutionsToggle(0)}
+                        disabled={!store.isAuth}
                     >
                         мои решения
                     </Button>
@@ -85,6 +93,7 @@ function CheckPoint() {
                         sx={{ flex: 1, ml: 2 }}
                         variant={solutionsToggle == 1 ? 'outlined' : 'contained'}
                         onClick={() => { setSolutionsToggle(1) }}
+                        disabled={!store.isAuth}
                     >
                         чужие решения
                     </Button>

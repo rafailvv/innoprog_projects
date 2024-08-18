@@ -63,7 +63,19 @@ export default class ApiService {
         return $api.get(`/feedback/${id}/`)
     }
     static async postSubmissionByCheckPointId(id: number, github: string, name: string, file?: File): Promise<AxiosResponse<SubmissionItem>> {
-        return $api.post(`/submission/${id}/`, {"github": github, "file": file, "name": name})
+        const formData = new FormData();
+        formData.append("github", github);
+        formData.append("name", name);
+        
+        if (file) {
+            formData.append("file", file);
+        }
+    
+        return $api.post(`/submission/${id}/`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
     }
 
     static async postLikeByFeedbackId(id: number, value: number): Promise<AxiosResponse<FeedbackItem>> {

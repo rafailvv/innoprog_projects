@@ -19,12 +19,13 @@ const AllProjects: FC = () => {
     const { store } = useContext(Context);
 
     const changeProjectsTab = (tab: number) => {
+        
         if (tab === 0) {
             setVisibleProjects(allProjects);
         } else if (tab === 1) {
-            setVisibleProjects(doneProjects);
-        } else if (tab === 2) {
             setVisibleProjects(inProgressProjects);
+        } else if (tab === 2) {
+            setVisibleProjects(doneProjects);
         }
     };
 

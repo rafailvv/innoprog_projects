@@ -8,12 +8,11 @@ import { UserItem } from "../models/types.ts";
 import ApiService from "../services/ApiService.ts";
 
 
-function Header({changeProjectsTab, disabledTabs}: {changeProjectsTab: (tab: number) => void, disabledTabs?: boolean}) {
+function Header({ changeProjectsTab, disabledTabs }: { changeProjectsTab?: (tab: number) => void, disabledTabs?: boolean }) {
     const { store } = useContext(Context);
     const navigator = useNavigate();
     const [profile, setProfile] = useState<UserItem | null>(null);
     const [activeTab, setActiveTab] = useState(0);
-
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -38,21 +37,26 @@ function Header({changeProjectsTab, disabledTabs}: {changeProjectsTab: (tab: num
             // alignItems: 'center',
             // justifyContent: 'space-between',
             // padding: '10px',
-            // marginBottom: '10px',
+            marginBottom: '20px',
             // marginTop: '20px',
         }}>
-            <Toolbar sx={{p: '5px'}}>
-                <img src={logo} alt="Logo" style={{ height: '50px' }} />
+            <Toolbar sx={{ p: '5px' }}>
+                <Button onClick={() => navigator('/projects')}>
+                    <img src={logo} alt="Logo" style={{ height: '50px' }} />
+                </Button>
                 <Box visibility={store.isAuth ? 'visible' : 'hidden'} sx={{ flexGrow: 1 }}>
                     <Tabs
                         value={activeTab}
                         aria-label="project tabs"
                         centered
-                        onChange={(_, newValue) => {setActiveTab(newValue); changeProjectsTab(newValue);}}
+                        onChange={(_, newValue) => {
+                            setActiveTab(newValue);
+                            changeProjectsTab ? changeProjectsTab(newValue) : navigator('/projects');
+                        }}
                     >
-                        <Tab label="Каталог" disabled={disabledTabs}/>
-                        <Tab label="В процессе" disabled={disabledTabs}/>
-                        <Tab label="Завершённые" disabled={disabledTabs}/>
+                        <Tab label="Каталог" disabled={disabledTabs} />
+                        <Tab label="В процессе" disabled={disabledTabs} />
+                        <Tab label="Завершённые" disabled={disabledTabs} />
                     </Tabs>
                 </Box>
                 {(store.isAuth && profile !== null) ? (

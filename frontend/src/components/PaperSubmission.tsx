@@ -31,7 +31,7 @@ function PaperSubmission({ value, onChange, externalSubmission }: { value: Submi
     }
     return (
         <>
-            <FeedbackDialog open={feedbackOpen} onClose={() => { setFeedbackOpen(false) }} submissionId={value.id} />
+            <FeedbackDialog submission={value} open={feedbackOpen} onClose={() => { setFeedbackOpen(false) }} submissionId={value.id} />
             <Paper
                 onClick={() => {
                     if (externalSubmission) {
@@ -54,7 +54,7 @@ function PaperSubmission({ value, onChange, externalSubmission }: { value: Submi
                     </>
                     :
                     <>
-                        <Chip label={"3.2"} color="primary" />
+                        <Chip label={value.avg_grade} color="primary" />
                         <Switch checked={is_visible} onClick={(event) => { event.stopPropagation() }} onChange={changeVisibility} />
                     </>
                 }

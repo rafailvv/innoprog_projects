@@ -13,8 +13,10 @@ function Submission() {
     const [feedbacks, setFeedbacks] = useState<FeedbackItem[]>([]);
 
     const onDownload = () => {
-        return;
-    }
+        const link = document.createElement("a");
+        link.href = submission.file;
+        link.click();
+    };
 
     useEffect(() => {
         ApiService.getFeedbacksBySubmissionId(submission.id)
@@ -26,7 +28,7 @@ function Submission() {
 
     return (
         <Box>
-            <Header changeProjectsTab={() => { }} />
+            <Header />
             <Container>
                 <Button onClick={() => { navigator(-1); }}> Мои решения </Button>
 

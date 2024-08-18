@@ -9,12 +9,19 @@ import { Circle } from '@mui/icons-material';
 import PaperElement from '../components/PaperElement';
 import { Context } from '../main';
 
+
+enum ProjectStatus {
+    NOTSTARTED,
+    INPROCESS,
+    DONE,
+}
+
 function Project() {
     // const checkPoints = 4;
     const [checkPoints, setCheckPoints] = useState<CheckPointItem[]>()
     const [project, setProject] = useState<ProjectItem>();
     const [submissions, setSubmissions] = useState<SubmissionItem[]>([]);
-    const [executionStatus, setExecutionStatus] = useState<number>(0);
+    const [executionStatus, setExecutionStatus] = useState<ProjectStatus>(ProjectStatus.NOTSTARTED);
     const navigator = useNavigate();
     const { store } = useContext(Context)
     
@@ -24,13 +31,20 @@ function Project() {
         ApiService.getProjectById(parseInt(projectId)).then(response => setProject(response.data))
         ApiService.getCheckPointsByProjectId(parseInt(projectId)).then(response => {
             setCheckPoints(response.data);
+            let projectStatus = 0;
             for (const point of response.data) {
+                if(!point.is_done) {
+                    projectStatus = 1;
+                }
                 ApiService.getSubmissionsByCheckPointId(point.id).then(response => {
                     console.log(response.data)
                     setSubmissions([...submissions, ...response.data.user_submissions])
                 })
             }
-
+            if(projectStatus == 0 && response.data.length > 0) {
+                projectStatus = 2;
+            }
+            setExecutionStatus(projectStatus);
         })
     }, [])
     // console.log(project)
@@ -66,13 +80,13 @@ function Project() {
 
     return (
         <Box>
-            <Header changeProjectsTab={() => { }} />
+            <Header />
             <Container>
                 <Button onClick={() => { navigator('/projects'); }}> Все Проекты</Button>
 
                 <Box display={'flex'} alignItems={'center'}>
-                    <Circle visibility={executionStatus > 0 ? 'visible' : 'hidden'}
-                        color={executionStatus == 2 ? 'success' : 'warning'}
+                    <Circle
+                        color={["disabled", "warning", "success"][executionStatus] as any}
                         sx={{ mr: 1 }} />
                     <Typography mr={2} variant='h4' fontWeight="bold">{project?.name.toUpperCase()}</Typography>
                     <Chip color='primary' label={project?.difficulty} size='medium' />
@@ -98,7 +112,7 @@ function Project() {
                     <List>
                         {checkPoints?.map((value, i) => <ListItemButton key={value.id} onClick={routeChange(value.id, i)}>
                             <ListItemIcon>
-                                <DoneIcon color={value.id > 1 ? 'warning' : 'success'}></DoneIcon>
+                                <DoneIcon color={value.is_done ? 'success' : 'warning'}></DoneIcon>
                             </ListItemIcon>
                             <ListItemText primary={value.name} />
                         </ListItemButton>)}

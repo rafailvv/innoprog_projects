@@ -1,17 +1,18 @@
-import { Button, Dialog, DialogContent, DialogTitle, Slider, TextField } from "@mui/material"
+import { Button, Dialog, DialogContent, DialogTitle, Slider, TextField, Typography } from "@mui/material"
 import { useState } from "react";
-import { FeedbackRequest } from "../models/types";
+import { FeedbackRequest, SubmissionItem } from "../models/types";
 import ApiService from "../services/ApiService";
 import { AxiosError } from "axios";
 
 export interface SimpleDialogProps {
     open: boolean;
     submissionId: number;
+    submission: SubmissionItem;
     onClose: (value: FeedbackRequest) => void;
 }
 
 function FeedbackDialog(props: SimpleDialogProps) {
-    const { onClose, open, submissionId } = props;
+    const { onClose, open, submissionId, submission } = props;
     const [comment, setComment] = useState('');
     const [grade, setGrade] = useState(4);
     const [errorText, setErrorText] = useState('');
@@ -32,15 +33,30 @@ function FeedbackDialog(props: SimpleDialogProps) {
             setComment('')
             handleClose()
         } catch (e: any) {
-            if(e as AxiosError && e.response?.status === 400) setErrorText(e.response.data.error)
+            if (e as AxiosError && e.response?.status === 400) setErrorText(e.response.data.error)
             console.error(e)
         }
     }
 
+    const onDownload = () => {
+        const link = document.createElement("a");
+        link.href = submission.file;
+        link.click();
+    };
+
     return (
-        <Dialog onClose={handleClose} open={open}>
-            <DialogTitle>Обратная связь</DialogTitle>
+        <Dialog onClose={handleClose} open={open} fullWidth>
+            <DialogTitle variant="h5">ОБРАТНАЯ СВЯЗЬ</DialogTitle>
             <DialogContent>
+                <Typography variant="h6" fontWeight={'bold'}>Ссылка на код решения</Typography>
+                <TextField fullWidth disabled label={submission.github}/>
+
+                <Typography variant="h6" fontWeight={'bold'}>Файл с решением</Typography>
+                <Button variant="contained" onClick={onDownload} disabled={submission?.file === null}>
+                    Скачать файл
+                </Button>
+
+                <Typography variant="h6" fontWeight={'bold'}>Комментарий</Typography>
                 <TextField
                     autoFocus
                     required
@@ -54,8 +70,10 @@ function FeedbackDialog(props: SimpleDialogProps) {
                     rows={4}
                     onChange={(e) => setComment(e.target.value)}
                     helperText={errorText}
-                    sx={{ mb: 5 }}
+                    // sx={{ mb: 2 }}
                 />
+                <Typography variant="h6" fontWeight={'bold'}>Оцените от 1 до 5</Typography>
+
                 <Slider
                     aria-label="Grade"
                     value={grade}

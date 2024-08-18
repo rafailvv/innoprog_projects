@@ -48,6 +48,13 @@ const theme = createTheme({
                     },
                 }
             }
+        },
+        MuiDialogTitle: {
+            styleOverrides: {
+                root: {
+                    fontWeight: 'bold',
+                }
+            }
         }
     }
 });

@@ -31,6 +31,7 @@ export interface CheckPointItem {
     description: string
     points: number
     project: number
+    is_done: string
 }
 
 export interface SubmissionItem {
@@ -38,11 +39,12 @@ export interface SubmissionItem {
     user: UserItem
     checkpoint: CheckPointItem
     github: string
-    file: File
+    file: string
     date_time: string
     is_visible: boolean
     accepted: boolean
     name: string
+    avg_grade: string
 }
 
 export interface FeedbackItem {

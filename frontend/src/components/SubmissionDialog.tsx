@@ -41,11 +41,10 @@ function SubmissionDialog(props: SimpleDialogProps) {
             onClose={onClose}
             sx={{ p: 2 }}
         >
-            <DialogTitle variant="h4" fontWeight="bold">
+            <DialogTitle variant="h5">
                 ЗАГРУЗКА РЕШЕНИЯ
             </DialogTitle>
             <DialogContent>
-
                 <Typography variant="h6" fontWeight="bold">
                     Название решения
                 </Typography>
