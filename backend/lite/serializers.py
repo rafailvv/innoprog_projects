@@ -125,13 +125,12 @@ class ProjectSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def get_users_in_progress(self, obj):
-        return Submission.objects.filter(checkpoint__project=obj, feedback__grade__lt=4).values('user').distinct().count()
+        return obj.users.count()
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         if instance.file:
             representation['file'] = settings.DOMAIN + settings.MEDIA_URL + str(instance.file)
-        representation['users_in_progress_count'] = self.get_users_in_progress(instance)
         return representation
 
 
