@@ -1,7 +1,10 @@
 #root {
-  max-width: 1280px;
+  /* max-width: 1280px; */
   margin: 0 auto;
-  text-align: center;
+  /* text-align: center; */
+}
+body {
+  margin: 0;
 }
 
 .read-the-docs {

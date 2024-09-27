@@ -29,7 +29,7 @@ function ProjectGrid({projects, name}: Props) {
                 {projects.map((value) => (
                     <Grid item xs='auto' key={value.id}>
                         <Button
-                            onClick={() => routeChange(value.id)}
+                            onClick={routeChange(value.id)}
                             variant='text'
                             sx={{
                                 minWidth: 'auto',

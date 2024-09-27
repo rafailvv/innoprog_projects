@@ -62,8 +62,20 @@ export default class ApiService {
     static async getFeedbacksBySubmissionId(id: number): Promise<AxiosResponse<FeedbackItem[]>> {
         return $api.get(`/feedback/${id}/`)
     }
-    static async postSubmissionByCheckPointId(id: number, github: string, file: string): Promise<AxiosResponse<any>> {
-        return $api.post(`/submission/${id}/`, {"github": github, "file": file})
+    static async postSubmissionByCheckPointId(id: number, github: string, name: string, file?: File): Promise<AxiosResponse<SubmissionItem>> {
+        const formData = new FormData();
+        formData.append("github", github);
+        formData.append("name", name);
+        
+        if (file) {
+            formData.append("file", file);
+        }
+    
+        return $api.post(`/submission/${id}/`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
     }
 
     static async postLikeByFeedbackId(id: number, value: number): Promise<AxiosResponse<FeedbackItem>> {
@@ -74,6 +86,19 @@ export default class ApiService {
     }
     static async postFeedbackBySubmissionId(id: number, feedbackRequest: FeedbackRequest): Promise<AxiosResponse<FeedbackItem>> {
         return $api.post(`/feedback/${id}/`, {"grade": feedbackRequest.grade, "comment": feedbackRequest.comment})
+    }
+
+    static async postProjectExecution(id: number): Promise<AxiosResponse<ProjectItem>> {
+        return $api.post(`/project/execution/${id}/`)
+    }
+    static async deleteProjectExecution(id: number): Promise<AxiosResponse<ProjectItem>> {
+        return $api.post(`/project/execution/${id}/`)
+    }
+    static async postSubmissionOpen(id: number): Promise<AxiosResponse<SubmissionItem>> {
+        return $api.post(`/submission/open/${id}/`)
+    }
+    static async postSubmissionClose(id: number): Promise<AxiosResponse<SubmissionItem>> {
+        return $api.post(`/submission/close/${id}/`)
     }
 
     static async getRefresh() {

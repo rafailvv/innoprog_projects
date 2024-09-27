@@ -11,7 +11,7 @@ function Submission({ submission }: { submission: SubmissionItem }) {
 
     return (
         <>
-            <FeedbackDialog open={open} onClose={closeFeedbackDialog} submissionId={submission.id} />
+            <FeedbackDialog submission={submission} open={open} onClose={closeFeedbackDialog} submissionId={submission.id} />
             <Button sx={{ overflowX: 'auto', paddingBottom: '15px' }} onClick={() => setOpen(true)}>
                 <Box textAlign={"left"}>
                     <Typography variant="h6" fontWeight="bold">

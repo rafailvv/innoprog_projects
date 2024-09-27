@@ -18,7 +18,7 @@ function ProjectCard({project}: Props) {
         }
     };
 
-    const {name, description, company, difficulty, users_in_progress_count} = project;
+    const {name, description, company, difficulty, users_in_progress} = project;
 
     return (
         <Card variant="outlined" sx={{width: 250, height: 350, borderRadius: 3, backgroundColor: '#EDE1FF'}}>
@@ -93,11 +93,9 @@ function ProjectCard({project}: Props) {
             <Divider/>
             <CardContent sx={{pt: 1, pb: 1}}>
                 <Typography gutterBottom variant="body2">
-                    {users_in_progress_count} {getWorkCountText(users_in_progress_count)}
+                    {users_in_progress} {getWorkCountText(parseInt(users_in_progress))}
                 </Typography>
             </CardContent>
-
-
         </Card>
     );
 }

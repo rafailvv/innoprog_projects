@@ -8,7 +8,7 @@ export interface ProjectItem {
     assessment_criteria: string
     company: CompanyItem
     difficulty: Difficulty,
-    users_in_progress_count : number,
+    users_in_progress : string,
 }
 export enum Difficulty {
     easy = "easy",
@@ -31,6 +31,7 @@ export interface CheckPointItem {
     description: string
     points: number
     project: number
+    is_done: string
 }
 
 export interface SubmissionItem {
@@ -42,6 +43,8 @@ export interface SubmissionItem {
     date_time: string
     is_visible: boolean
     accepted: boolean
+    name: string
+    avg_grade: string
 }
 
 export interface FeedbackItem {
@@ -76,4 +79,6 @@ export interface UserItem {
     telegram_username: string
     telegram_id: number
     photo_fase : string
+    teacher: boolean
+    position: string
 }
