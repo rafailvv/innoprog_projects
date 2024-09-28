@@ -1,6 +1,6 @@
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator # максимальная и минимальная длинна символов
 from django.contrib.auth.models import AbstractUser
-from django.db import models
+from django.db import models # унаследование с базы данных
 from django.db.models import Avg
 
 
