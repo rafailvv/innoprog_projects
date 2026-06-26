@@ -11,26 +11,60 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 import os
 from datetime import timedelta
-
-import dotenv
-from dotenv import dotenv_values
-
-config = dotenv_values(".env")
 from pathlib import Path
+
+from dotenv import dotenv_values
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+config = {
+    **dotenv_values(BASE_DIR / ".env"),
+    **dotenv_values(BASE_DIR.parent / ".env"),
+    **os.environ,
+}
+
+
+def env(name: str, default: str | None = None) -> str:
+    value = config.get(name, default)
+    if value is None:
+        raise RuntimeError(f"Missing required environment variable: {name}")
+    return str(value)
+
+
+def env_bool(name: str, default: bool = False) -> bool:
+    value = config.get(name)
+    if value is None:
+        return default
+    return str(value).strip().lower() in {"1", "true", "yes", "on"}
+
+
+def env_csv(name: str, default: str = "") -> list[str]:
+    return [item.strip() for item in env(name, default).split(",") if item.strip()]
+
+
+def validate_secret_key(secret_key: str) -> None:
+    unsafe_prefixes = ("change-this", "django-insecure-")
+    if not DEBUG and (len(secret_key) < 32 or secret_key.startswith(unsafe_prefixes)):
+        raise RuntimeError("SECRET_KEY must be a strong production secret from environment")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-avdq5xnoxo5m#$wh(g(_o928fupfyxt=u5t6^vkp(kw(#n7@_k'
+SECRET_KEY = env("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env_bool("DEBUG", False)
+validate_secret_key(SECRET_KEY)
 
-ALLOWED_HOSTS = ["projects.innoprog.ru", "127.0.0.1", "185.209.28.14"]
+ALLOWED_HOSTS = env_csv("ALLOWED_HOSTS", "projects.innoprog.ru,127.0.0.1,localhost")
+CSRF_TRUSTED_ORIGINS = env_csv(
+    "CSRF_TRUSTED_ORIGINS",
+    "https://projects.innoprog.ru,https://app.innoprog.ru,https://innoprog.ru,https://www.innoprog.ru",
+)
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
 
 # Application definition
 
@@ -85,11 +119,11 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config['NAME'],
-        'USER': config['USER'],
-        'PASSWORD': config['PASSWORD'],
-        'HOST': config['HOST'],
-        'PORT': config['PORT'],
+        'NAME': env('NAME'),
+        'USER': env('USER'),
+        'PASSWORD': env('PASSWORD'),
+        'HOST': env('HOST'),
+        'PORT': env('PORT'),
     }
 }
 
@@ -135,8 +169,12 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CORS_ALLOW_ALL_ORIGINS = True  # Это значение по умолчанию и оно должно быть False
-CORS_ALLOW_CREDENTIALS = True  # Если вам нужны кукисы или авторизация
+CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOWED_ORIGINS = env_csv(
+    "CORS_ALLOWED_ORIGINS",
+    "https://projects.innoprog.ru,https://app.innoprog.ru,https://innoprog.ru,https://www.innoprog.ru",
+)
+CORS_ALLOW_CREDENTIALS = env_bool("CORS_ALLOW_CREDENTIALS", True)
 
 CORS_ALLOW_HEADERS = [
     'content-type',
@@ -188,4 +226,4 @@ SWAGGER_SETTINGS = {
 }
 
 AUTH_USER_MODEL = 'lite.User'
-DOMAIN = config["DOMEN"]
+DOMAIN = env("DOMEN", "https://projects.innoprog.ru")
