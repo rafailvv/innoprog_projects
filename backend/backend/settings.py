@@ -42,6 +42,10 @@ def env_csv(name: str, default: str = "") -> list[str]:
     return [item.strip() for item in env(name, default).split(",") if item.strip()]
 
 
+def env_int(name: str, default: int) -> int:
+    return int(env(name, str(default)))
+
+
 def validate_secret_key(secret_key: str) -> None:
     unsafe_prefixes = ("change-this", "django-insecure-")
     if not DEBUG and (len(secret_key) < 32 or secret_key.startswith(unsafe_prefixes)):
@@ -227,3 +231,7 @@ SWAGGER_SETTINGS = {
 
 AUTH_USER_MODEL = 'lite.User'
 DOMAIN = env("DOMEN", "https://projects.innoprog.ru")
+TELEGRAM_BOT_TOKEN = env("TELEGRAM_BOT_TOKEN", "")
+INNOPROG_PLATFORM_AUTH_SECRET = env("INNOPROG_PLATFORM_AUTH_SECRET", TELEGRAM_BOT_TOKEN)
+TELEGRAM_INIT_DATA_MAX_AGE_SECONDS = env_int("TELEGRAM_INIT_DATA_MAX_AGE_SECONDS", 86400)
+ALLOW_UNVERIFIED_TELEGRAM_LOGIN = env_bool("ALLOW_UNVERIFIED_TELEGRAM_LOGIN", DEBUG)

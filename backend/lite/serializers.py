@@ -97,13 +97,17 @@ class LoginSerializer(serializers.Serializer):
     password = serializers.CharField(required=True)
 
 
-class UserTgSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ['telegram_id']
-        extra_kwargs = {
-            'telegram_id': {'required': True}
-        }
+class UserTgSerializer(serializers.Serializer):
+    telegram_id = serializers.IntegerField(required=False)
+    init_data = serializers.CharField(required=False, allow_blank=False, trim_whitespace=False)
+    initData = serializers.CharField(required=False, allow_blank=False, trim_whitespace=False, write_only=True)
+    platform_auth_token = serializers.CharField(required=False, allow_blank=False, trim_whitespace=False)
+    auth = serializers.CharField(required=False, allow_blank=False, trim_whitespace=False, write_only=True)
+
+    def validate(self, data):
+        if not any(data.get(field) is not None for field in ('telegram_id', 'init_data', 'initData', 'platform_auth_token', 'auth')):
+            raise serializers.ValidationError('Передайте Telegram initData или подписанный токен платформы.')
+        return data
 
 class CompanySerializer(serializers.ModelSerializer):
     class Meta:

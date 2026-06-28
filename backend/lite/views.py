@@ -1,5 +1,6 @@
 import datetime
 
+from django.conf import settings
 from django.contrib.auth import authenticate
 from django.core.exceptions import ValidationError
 from django.http import JsonResponse
@@ -16,6 +17,8 @@ from .serializers import ProjectSerializer, UserSerializer, LoginSerializer, Use
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
+
+from .auth_tokens import AuthTokenError, parse_platform_auth_token, verify_telegram_init_data
 
 
 @swagger_auto_schema(
@@ -279,7 +282,12 @@ def login_tg_view(request):
     serializer = UserTgSerializer(data=request.data)
 
     if serializer.is_valid():
-        telegram_id = serializer.validated_data['telegram_id']
+        try:
+            telegram_id = _resolve_verified_telegram_id(request, serializer.validated_data)
+        except AuthTokenError as exc:
+            return Response({'error': str(exc)}, status=status.HTTP_401_UNAUTHORIZED)
+        except PermissionError as exc:
+            return Response({'error': str(exc)}, status=status.HTTP_403_FORBIDDEN)
 
         try:
             user = User.objects.get(telegram_id=telegram_id)
@@ -293,6 +301,36 @@ def login_tg_view(request):
         }, status=status.HTTP_200_OK)
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+def _resolve_verified_telegram_id(request, data):
+    expected_telegram_id = data.get('telegram_id')
+    init_data = data.get('init_data') or data.get('initData')
+    platform_auth_token = (
+        data.get('platform_auth_token')
+        or data.get('auth')
+        or request.headers.get('X-Platform-Auth')
+    )
+
+    if init_data:
+        verified_telegram_id = verify_telegram_init_data(
+            init_data,
+            settings.TELEGRAM_BOT_TOKEN,
+            max_age_seconds=settings.TELEGRAM_INIT_DATA_MAX_AGE_SECONDS,
+        )
+    elif platform_auth_token:
+        verified_telegram_id = parse_platform_auth_token(
+            platform_auth_token,
+            settings.INNOPROG_PLATFORM_AUTH_SECRET,
+        )
+    elif settings.ALLOW_UNVERIFIED_TELEGRAM_LOGIN and expected_telegram_id is not None:
+        verified_telegram_id = int(expected_telegram_id)
+    else:
+        raise AuthTokenError('Требуется Telegram initData или подписанный токен платформы')
+
+    if expected_telegram_id is not None and int(expected_telegram_id) != verified_telegram_id:
+        raise PermissionError('Подписанный токен не соответствует пользователю')
+    return verified_telegram_id
 
 
 @swagger_auto_schema(
@@ -941,6 +979,5 @@ def project_execution_view(request,id):
             return Response(status=status.HTTP_204_NO_CONTENT)
         except Project.DoesNotExist:
             return JsonResponse({'error': 'Проект не найден'}, status=status.HTTP_400_BAD_REQUEST)
-
 
 
